@@ -1,7 +1,7 @@
 # new-web-app
 
-<b>QUICK ACCESS TESTING URLS:</b>
+<h1><b>QUICK ACCESS TESTING URLS:</b></h1>
 <br>
-Backend: http://localhost:8000/hello/
-Frontend: http://localhost:3000/
-PgAdmin: http://localhost:5050/ (login: admin@example.com, password: admin)
+<li> Backend: http://localhost:8000/hello/
+<li> Frontend: http://localhost:3000/
+<li> PgAdmin: http://localhost:5050/ (login: admin@example.com, password: admin)
