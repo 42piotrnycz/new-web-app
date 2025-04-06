@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Profil</title>
+</head>
+<body>
+<h1>Twój profil</h1>
+<div id="user-info">
+    Ładowanie...
+</div>
+
+<script>
+    fetch('/api/users/me')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('user-info').innerText = 'Nazwa użytkownika: ' + data.username;
+        })
+        .catch(error => {
+            document.getElementById('user-info').innerText = 'Błąd ładowania danych';
+        });
+</script>
+</body>
+</html>

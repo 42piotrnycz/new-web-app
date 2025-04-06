@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
 
+import java.security.Principal;
+
 @Controller
 public class UserController {
 
@@ -34,4 +36,10 @@ public class UserController {
     public String showLoginPage() {
         return "login";
     }
+
+    @GetMapping("/profile")
+    public String showProfilePage() {
+        return "profile";
+    }
+
 }
