@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Logowanie</title>
-</head>
+<head><title>Logowanie</title></head>
 <body>
 <h2>Logowanie</h2>
 <form method="post" action="/login">
-    <label>Username:</label>
+    <label>Login:</label>
     <input type="text" name="username" required><br>
-    <label>Password:</label>
+    <label>Hasło:</label>
     <input type="password" name="password" required><br>
     <button type="submit">Zaloguj</button>
 </form>
-<a href="/register">Rejestracja</a>
+
+<div th:if="${param.error}" style="color: red;">
+    <p>Niepoprawny login lub hasło. Spróbuj ponownie.</p>
+</div>
+
+<a href="/register">Nie masz konta? Zarejestruj się</a>
 </body>
 </html>
