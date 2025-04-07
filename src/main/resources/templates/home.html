@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Strona główna</title>
 </head>
 <body>
 <h1>Witaj na stronie głównej!</h1>
 
-<a href="/profile">Zobacz swój profil</a>
+<!-- Correctly inject the user ID using Thymeleaf -->
+<a th:href="@{/profile(id=${user.id})}">Zobacz swój profil</a>
 
 <a href="/logout">Wyloguj</a>
 </body>

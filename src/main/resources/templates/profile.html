@@ -4,13 +4,20 @@
     <title>Profil</title>
 </head>
 <body>
+<a href="/home">Powrót</a>
+
 <h1>Twój profil</h1>
 <div id="user-info">
     Ładowanie informacji...
 </div>
 
 <script>
-    fetch('/api/users/me')
+    // Pobierz ID z parametru URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const userId = urlParams.get('id');
+
+    // Załaduj dane użytkownika przez API
+    fetch(`/api/users/${userId}`)
         .then(response => response.json())
         .then(data => {
             const userInfo = `

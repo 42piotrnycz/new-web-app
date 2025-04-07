@@ -1,20 +1,25 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.User;
+import com.example.demo.repository.UserRepository;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.ui.Model;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Controller
 public class UserController {
 
     @Autowired
     private UserService userService;
-
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private UserRestController userRestController;
 
@@ -42,23 +47,17 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public String redirectToOwnProfile(Principal principal, @RequestParam(required = false) Long id) {
-        Long userId = userService.getUserIdByUsername(principal.getName());
+    public String profilePage(@RequestParam Long id, Model model) {
+        Optional<User> user = userRepository.findById(id);
 
-        if (id == null || !id.equals(userId)) {
-            return "redirect:/profile?id=" + userId;
+        if (user.isPresent()) {
+            model.addAttribute("user", user.get());
+            return "profile";  // Return the profile page view
         }
 
-        return "profile";
+        return "error";  // Handle the case where the user is not found
     }
 
-
-
-
-    @GetMapping("/profile-view")
-    public String showProfilePage() {
-        return "profile"; // to profile.html
-    }
 
 
 }

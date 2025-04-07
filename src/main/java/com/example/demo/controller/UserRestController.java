@@ -25,7 +25,7 @@ public class UserRestController {
 
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
-            return ResponseEntity.ok(user); // 200 OK + JSON
+            return ResponseEntity.ok(user); // Zwróci dane użytkownika w formacie JSON
         } else {
             return ResponseEntity
                     .status(404)
