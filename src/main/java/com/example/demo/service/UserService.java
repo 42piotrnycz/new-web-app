@@ -31,7 +31,7 @@ public class UserService {
         return true;
     }
 
-    public Long getUserIdByUsername(String username) {
+    public Integer getUserIdByUsername(String username) {
         return userRepository.findByUsername(username).map(User::getId).orElse(null);
     }
 
