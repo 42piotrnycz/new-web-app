@@ -4,7 +4,8 @@
     <title>Profil</title>
 </head>
 <body>
-<a href="/home">Powrót</a>
+
+<div th:replace="~{fragments/navbar :: navbar}"></div>
 
 <h1>Twój profil</h1>
 <div id="user-info">
@@ -12,11 +13,9 @@
 </div>
 
 <script>
-    // Pobierz ID z parametru URL
     const urlParams = new URLSearchParams(window.location.search);
     const userId = urlParams.get('id');
 
-    // Załaduj dane użytkownika przez API
     fetch(`/api/users/${userId}`)
         .then(response => response.json())
         .then(data => {
