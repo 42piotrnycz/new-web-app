@@ -8,23 +8,26 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reviewID")
+    @Column(name = "reviewid")  // poprawione
     private Integer reviewID;
 
-    @Column(name = "userID", nullable = false)
+    @Column(name = "userid", nullable = false)  // poprawione
     private Integer userID;
 
-    @Column(name = "contentType", nullable = false)
+    @Column(name = "content_type", nullable = false)  // poprawione
     private String contentType;
 
-    @Column(name = "contentTitle", nullable = false)
+    @Column(name = "content_title", nullable = false)  // poprawione
     private String contentTitle;
 
-    @Column(name = "reviewTitle")
+    @Column(name = "review_title")  // poprawione
     private String reviewTitle;
 
-    @Column(name = "reviewDescription", nullable = false)
+    @Column(name = "review_description", nullable = false)  // poprawione
     private String reviewDescription;
+
+    @Column(name = "cover_file")
+    private String coverFile;
 
     // Konstruktory
     public Review() {}
@@ -85,4 +88,14 @@ public class Review {
     public void setReviewDescription(String reviewDescription) {
         this.reviewDescription = reviewDescription;
     }
+
+    // Getter i Setter
+    public String getCoverFile() {
+        return coverFile;
+    }
+
+    public void setCoverFile(String coverFile) {
+        this.coverFile = coverFile;
+    }
+
 }

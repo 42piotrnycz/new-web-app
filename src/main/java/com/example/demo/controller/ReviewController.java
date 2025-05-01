@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @Controller
@@ -35,7 +36,7 @@ public class ReviewController {
     }
 
     @PostMapping("/add-review")
-    public String addReview(@RequestParam("file") MultipartFile file,
+    public String addReview(@RequestParam("cover") MultipartFile cover,
                             @RequestParam("contentType") String contentType,
                             @RequestParam("contentTitle") String contentTitle,
                             @RequestParam("reviewTitle") String reviewTitle,
@@ -43,31 +44,36 @@ public class ReviewController {
                             Principal principal) throws IOException {
 
         // 1. Ścieżka na dysku
-        String uploadDir = "uploads/";
-        File uploadPath = new File(uploadDir);
-        if (!uploadPath.exists()) {
-            uploadPath.mkdirs();  // <-- stworzy uploads/ jeśli brak
-        }
+        String uploadDir = new File("uploads").getAbsolutePath();
 
         // 2. Zapis pliku
-        String fileName = file.getOriginalFilename();
-        File destination = new File(uploadPath, fileName);
-        file.transferTo(destination);
+        String originalFilename = cover.getOriginalFilename();
+        String extension = "";
+
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+        }
+
+        String fileName = UUID.randomUUID().toString() + extension;
+
+        File destination = new File(uploadDir, fileName);
+        cover.transferTo(destination);
 
         // 3. Zapis danych do bazy
+
         Review review = new Review();
-        review.setUserID(getUserIDFromPrincipal(principal));  // <- np. funkcja która znajdzie ID użytkownika
+        review.setUserID(getUserIDFromPrincipal(principal));
         review.setContentType(contentType);
         review.setContentTitle(contentTitle);
         review.setReviewTitle(reviewTitle);
         review.setReviewDescription(reviewDescription);
-        // możesz też zapisać ścieżkę do okładki w bazie
-        // review.setCoverPath(uploadDir + fileName);
+        review.setCoverFile(fileName);  // <-- nowy wiersz
 
         reviewRepository.save(review);
 
         return "redirect:/reviews";
     }
+
 
     private Integer getUserIDFromPrincipal(Principal principal) {
         String username = principal.getName();
