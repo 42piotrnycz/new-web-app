@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -80,6 +81,14 @@ public class ReviewController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found: " + username));
         return user.getId();
+    }
+
+    @GetMapping("reviews/user/{userId}")
+    public String getUserReviews(@PathVariable Integer userId, Model model) {
+        List<Review> reviews = reviewRepository.findByUserID(userId);
+        model.addAttribute("reviews", reviews);
+        model.addAttribute("userId", userId);
+        return "user-reviews"; // nazwa pliku HTML bez .html
     }
 
 }
