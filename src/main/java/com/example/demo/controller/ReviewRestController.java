@@ -16,14 +16,18 @@ public class ReviewRestController {
     @Autowired
     private ReviewRepository reviewRepository;
 
-    // GET /api/reviews/user/{userId}
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getReviewsByUserId(@PathVariable Integer userId) {
-        List<Review> reviews = reviewRepository.findByUserID(userId);
-        if (reviews.isEmpty()) {
-            return ResponseEntity.status(404)
-                    .body(Map.of("error", "Brak recenzji dla użytkownika o ID " + userId));
+        try {
+            List<Review> reviews = reviewRepository.findByUserID(userId);
+            if (reviews.isEmpty()) {
+                return ResponseEntity.ok()
+                        .body(Map.of("message", "Brak recenzji dla użytkownika o ID " + userId));
+            }
+            return ResponseEntity.ok(reviews);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Wystąpił błąd podczas pobierania recenzji: " + e.getMessage()));
         }
-        return ResponseEntity.ok(reviews);
     }
 }

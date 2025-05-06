@@ -38,13 +38,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())  // Wyłączenie CSRF dla celów testowych
-                .authorizeRequests(auth -> auth
-                        .antMatchers("/api/auth/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()  // Zezwalaj na dostęp do logowania i rejestracji
-                        .antMatchers("/admin/**").hasRole("ADMIN")  // Tylko admini mogą odwiedzać "/admin/**"
-                        .anyRequest().authenticated()  // Wymaga autentykacji dla pozostałych żądań
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**", "/register", "/login", "/css/**", "/js/**", "/images/**", "/uploads/**").permitAll()
+                        .requestMatchers("/api/reviews/**", "/reviews/**").authenticated()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class);  // Dodanie filtra JWT
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/home")
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login")
+                        .permitAll()
+                )
+                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

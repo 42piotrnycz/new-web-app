@@ -8,36 +8,37 @@ public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "reviewid")  // poprawione
+    @Column(name = "\"reviewID\"", nullable = false)
     private Integer reviewID;
 
-    @Column(name = "userid", nullable = false)  // poprawione
+    @Column(name = "\"userID\"", nullable = false)
     private Integer userID;
 
-    @Column(name = "content_type", nullable = false)  // poprawione
+    @Column(name = "\"contentType\"", nullable = false)
     private String contentType;
 
-    @Column(name = "content_title", nullable = false)  // poprawione
+    @Column(name = "\"contentTitle\"", nullable = false)
     private String contentTitle;
 
-    @Column(name = "review_title")  // poprawione
+    @Column(name = "\"reviewTitle\"")
     private String reviewTitle;
 
-    @Column(name = "review_description", nullable = false)  // poprawione
+    @Column(name = "\"reviewDescription\"", nullable = false)
     private String reviewDescription;
 
-    @Column(name = "cover_file")
+    @Column(name = "\"coverFile\"")
     private String coverFile;
 
     // Konstruktory
     public Review() {}
 
-    public Review(Integer userID, String contentType, String contentTitle, String reviewTitle, String reviewDescription) {
+    public Review(Integer userID, String contentType, String contentTitle, String reviewTitle, String reviewDescription, String coverFile) {
         this.userID = userID;
         this.contentType = contentType;
         this.contentTitle = contentTitle;
         this.reviewTitle = reviewTitle;
         this.reviewDescription = reviewDescription;
+        this.coverFile = coverFile;
     }
 
     // Gettery i Settery
@@ -89,7 +90,6 @@ public class Review {
         this.reviewDescription = reviewDescription;
     }
 
-    // Getter i Setter
     public String getCoverFile() {
         return coverFile;
     }

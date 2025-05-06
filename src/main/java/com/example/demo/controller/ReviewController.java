@@ -42,39 +42,55 @@ public class ReviewController {
                             @RequestParam("contentTitle") String contentTitle,
                             @RequestParam("reviewTitle") String reviewTitle,
                             @RequestParam("reviewDescription") String reviewDescription,
-                            Principal principal) throws IOException {
+                            Principal principal,
+                            Model model) {
+        try {
+            // Validate required fields
+            if (contentType == null || contentType.trim().isEmpty() ||
+                contentTitle == null || contentTitle.trim().isEmpty() ||
+                reviewDescription == null || reviewDescription.trim().isEmpty()) {
+                model.addAttribute("error", "Wszystkie pola oznaczone jako wymagane muszą być wypełnione");
+                return "add-review";
+            }
 
-        // 1. Ścieżka na dysku
-        String uploadDir = new File("uploads").getAbsolutePath();
+            // First handle the file upload
+            String fileName = null;
+            if (!cover.isEmpty()) {
+                String uploadDir = new File("uploads").getAbsolutePath();
+                new File(uploadDir).mkdirs();
 
-        // 2. Zapis pliku
-        String originalFilename = cover.getOriginalFilename();
-        String extension = "";
+                String originalFilename = cover.getOriginalFilename();
+                String extension = "";
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+                }
 
-        if (originalFilename != null && originalFilename.contains(".")) {
-            extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+                fileName = UUID.randomUUID().toString() + extension;
+                File destination = new File(uploadDir, fileName);
+                cover.transferTo(destination);
+            }
+
+            // Get the user ID first
+            Integer userID = getUserIDFromPrincipal(principal);
+
+            // Create and populate the review object in the correct order
+            Review review = new Review(
+                userID,
+                contentType.trim(),
+                contentTitle.trim(),
+                reviewTitle != null ? reviewTitle.trim() : null,
+                reviewDescription.trim(),
+                fileName
+            );
+
+            reviewRepository.save(review);
+            
+            return "redirect:/reviews/user/" + userID;
+        } catch (Exception e) {
+            model.addAttribute("error", "Wystąpił błąd podczas dodawania recenzji: " + e.getMessage());
+            return "add-review";
         }
-
-        String fileName = UUID.randomUUID().toString() + extension;
-
-        File destination = new File(uploadDir, fileName);
-        cover.transferTo(destination);
-
-        // 3. Zapis danych do bazy
-
-        Review review = new Review();
-        review.setUserID(getUserIDFromPrincipal(principal));
-        review.setContentType(contentType);
-        review.setContentTitle(contentTitle);
-        review.setReviewTitle(reviewTitle);
-        review.setReviewDescription(reviewDescription);
-        review.setCoverFile(fileName);  // <-- nowy wiersz
-
-        reviewRepository.save(review);
-
-        return "redirect:/reviews";
     }
-
 
     private Integer getUserIDFromPrincipal(Principal principal) {
         String username = principal.getName();
@@ -85,10 +101,15 @@ public class ReviewController {
 
     @GetMapping("reviews/user/{userId}")
     public String getUserReviews(@PathVariable Integer userId, Model model) {
-        List<Review> reviews = reviewRepository.findByUserID(userId);
-        model.addAttribute("reviews", reviews);
-        model.addAttribute("userId", userId);
-        return "user-reviews"; // nazwa pliku HTML bez .html
+        try {
+            List<Review> reviews = reviewRepository.findByUserID(userId);
+            model.addAttribute("reviews", reviews);
+            model.addAttribute("userId", userId);
+            return "user-reviews";
+        } catch (Exception e) {
+            model.addAttribute("error", "Wystąpił błąd podczas pobierania recenzji: " + e.getMessage());
+            return "error";
+        }
     }
 
 }
