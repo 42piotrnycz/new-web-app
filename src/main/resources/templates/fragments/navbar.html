@@ -1,0 +1,22 @@
+<!-- templates/fragments/navbar.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="navbar">
+    <a href="/home">Powrót</a>
+
+    <nav style="display: flex; justify-content: flex-end; gap: 20px; padding: 10px; background-color: #f8f9fa;">
+        <a href="/logout">Wyloguj</a>
+
+        <a th:href="@{/profile(id=${user.id})}">
+            <img src="/images/profile-icon.png" alt="Profil" style="width: 24px; height: 24px;">
+        </a>
+
+        <a th:href="@{/api/reviews/user/{id}(id=${user.id})}">Zobacz recenzje</a>
+        <a th:href="@{/reviews/user/{id}(id=${user.id})}">Moje recenzje</a>
+
+        <a th:href="@{/add-review}">Add Review</a>
+    </nav>
+</div>
+</body>
+</html>

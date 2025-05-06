@@ -1,17 +1,16 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.User;
 import com.example.demo.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import org.springframework.ui.Model;
-
 @Controller
+@RequiredArgsConstructor
 public class UserController {
-
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/register")
     public String showRegisterForm() {
@@ -20,10 +19,10 @@ public class UserController {
 
     @PostMapping("/register")
     public String processRegistration(@RequestParam String username,
-                                      @RequestParam String password,
-                                      Model model) {
-        boolean success = userService.registerUser(username, password);
-        if (!success) {
+                                    @RequestParam String password,
+                                    @RequestParam String email,
+                                    Model model) {
+        if (!userService.registerUser(username, password, email)) {
             model.addAttribute("error", "Użytkownik o podanym loginie już istnieje.");
             return "register";
         }
@@ -33,5 +32,15 @@ public class UserController {
     @GetMapping("/login")
     public String showLoginPage() {
         return "login";
+    }
+
+    @GetMapping("/profile")
+    public String profilePage(@RequestParam Long id, Model model) {
+        return userService.findById(id)
+                .map(user -> {
+                    model.addAttribute("user", user);
+                    return "profile";
+                })
+                .orElse("error");
     }
 }
