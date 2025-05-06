@@ -1,6 +1,8 @@
 package com.example.demo.config;
 
 import com.example.demo.service.CustomUserDetailsService;
+import com.example.demo.security.JwtFilter;
+import com.example.demo.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,14 +12,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-
-
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -32,23 +38,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()  // Zezwalaj na dostęp do rejestracji, logowania i zasobów statycznych
-                        .anyRequest().authenticated()  // Wymagaj autentykacji dla pozostałych żądań
+                .csrf(csrf -> csrf.disable())  // Wyłączenie CSRF dla celów testowych
+                .authorizeRequests(auth -> auth
+                        .antMatchers("/api/auth/**", "/register", "/login", "/css/**", "/js/**", "/images/**").permitAll()  // Zezwalaj na dostęp do logowania i rejestracji
+                        .antMatchers("/admin/**").hasRole("ADMIN")  // Tylko admini mogą odwiedzać "/admin/**"
+                        .anyRequest().authenticated()  // Wymaga autentykacji dla pozostałych żądań
                 )
-                .formLogin(form -> form
-                        .loginPage("/login") // Strona logowania
-                        .defaultSuccessUrl("/home", true) // Po pomyślnym zalogowaniu przekierowanie do strony home
-                        .failureUrl("/login?error=true") // W przypadku nieudanej próby logowania
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout")  // Przekierowanie po wylogowaniu
-                        .permitAll()  // Zezwalaj na dostęp do wylogowania
-                )
-                .csrf(csrf -> csrf.disable());  // Wyłączenie CSRF dla celów testowych
+                .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class);  // Dodanie filtra JWT
 
         return http.build();
     }
 }
-
