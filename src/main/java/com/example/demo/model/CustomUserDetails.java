@@ -1,25 +1,18 @@
 package com.example.demo.model;
 
-import com.example.demo.model.User;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.List;
 
+@RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
-
-    private User user;
-
-    public CustomUserDetails(User user) {
-        this.user = user;
-    }
+    private final User user;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Zwracamy rolę użytkownika jako SimpleGrantedAuthority (Spring Security)
-        // Zakładamy, że użytkownik ma tylko jedną rolę (Role)
         return List.of(new SimpleGrantedAuthority(user.getRole().name()));
     }
 
@@ -53,8 +46,7 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
-    // Dodajemy metodę, aby zwrócić użytkownika
     public User getUser() {
-        return this.user;
+        return user;
     }
 }

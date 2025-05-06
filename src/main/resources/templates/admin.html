@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Panel Administratora</title>
+    <style>
+        .admin-panel {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .users-table th, .users-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .users-table th {
+            background-color: #f8f9fa;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .edit-btn {
+            background-color: #0d6efd;
+            color: white;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-panel">
+        <h1>Panel Administratora</h1>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Liczba użytkowników</h3>
+                <p th:text="${userCount}">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Liczba recenzji</h3>
+                <p th:text="${reviewCount}">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Aktywni użytkownicy</h3>
+                <p th:text="${activeUsers}">0</p>
+            </div>
+        </div>
+
+        <h2>Lista użytkowników</h2>
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nazwa użytkownika</th>
+                    <th>Email</th>
+                    <th>Rola</th>
+                    <th>Liczba recenzji</th>
+                    <th>Akcje</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td th:text="${user.id}"></td>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td th:text="${user.reviewCount}"></td>
+                    <td>
+                        <button class="action-btn edit-btn" 
+                                th:onclick="'window.location.href=\'/admin/user/edit/' + ${user.id} + '\''">
+                            Edytuj
+                        </button>
+                        <button class="action-btn delete-btn" 
+                                th:onclick="'if(confirm(\'Czy na pewno chcesz usunąć tego użytkownika?\')) window.location.href=\'/admin/user/delete/' + ${user.id} + '\''">
+                            Usuń
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

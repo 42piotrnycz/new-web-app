@@ -1,46 +1,32 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Review;
 import com.example.demo.model.User;
-import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/users")
+@RequiredArgsConstructor
 public class UserRestController {
+    private final UserRepository userRepository;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    // GET /api/users/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable Long id) {
-        Optional<User> optionalUser = userRepository.findById(id);
-
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            return ResponseEntity.ok(user); // Zwróci dane użytkownika w formacie JSON
-        } else {
-            return ResponseEntity
-                    .status(404)
-                    .body("{\"error\":\"Użytkownik o ID " + id + " nie został znaleziony\"}");
-        }
+    public ResponseEntity<Object> getUserById(@PathVariable Long id) {
+        return userRepository.findById(id)
+                .map(user -> ResponseEntity.ok().body((Object) user))
+                .orElse(ResponseEntity.status(404)
+                        .body(Map.of("error", "Użytkownik o ID " + id + " nie został znaleziony")));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<?> getCurrentUser(Principal principal) {
+    public ResponseEntity<Object> getCurrentUser(Principal principal) {
         return userRepository.findByUsername(principal.getName())
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body((User) Map.of("error", "Nie znaleziono użytkownika")));
+                .map(user -> ResponseEntity.ok().body((Object) user))
+                .orElse(ResponseEntity.status(404)
+                        .body(Map.of("error", "Nie znaleziono użytkownika")));
     }
 }
