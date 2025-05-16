@@ -1,12 +1,40 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
 import ReviewList from './components/Reviews/ReviewList';
 import AddReview from './components/Reviews/AddReview';
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import Profile from './components/Profile/Profile';
+import { authService } from './services/auth';
 import './App.css';
 
 function App() {
-  // TODO: Get actual user ID from authentication
-  const userId = 1; 
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const userData = await authService.getCurrentUser();
+        setUser(userData);
+      } catch (error) {
+        console.error('Auth check failed:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  const handleLogout = () => {
+    authService.logout();
+    setUser(null);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Router>
@@ -16,30 +44,59 @@ function App() {
             <Typography variant="h6" style={{ flexGrow: 1 }}>
               ZTPAI Reviews
             </Typography>
-            <Button color="inherit" component={Link} to="/">
-              Home
-            </Button>
-            <Button color="inherit" component={Link} to="/reviews">
-              My Reviews
-            </Button>
-            <Button color="inherit" component={Link} to="/add-review">
-              Add Review
-            </Button>
-            <Button color="inherit" component={Link} to="/profile">
-              Profile
-            </Button>
-            <Button color="inherit">
-              Logout
-            </Button>
+            {user ? (
+              <>
+                <Button color="inherit" component={Link} to="/">
+                  Home
+                </Button>
+                <Button color="inherit" component={Link} to="/reviews">
+                  My Reviews
+                </Button>
+                <Button color="inherit" component={Link} to="/add-review">
+                  Add Review
+                </Button>
+                <Button color="inherit" component={Link} to="/profile">
+                  Profile
+                </Button>
+                <Button color="inherit" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button color="inherit" component={Link} to="/login">
+                  Login
+                </Button>
+                <Button color="inherit" component={Link} to="/register">
+                  Register
+                </Button>
+              </>
+            )}
           </Toolbar>
         </AppBar>
 
         <Container style={{ marginTop: '2rem' }}>
           <Routes>
-            <Route path="/" element={<div>Welcome to ZTPAI Reviews</div>} />
-            <Route path="/reviews" element={<ReviewList userId={userId} />} />
-            <Route path="/add-review" element={<AddReview />} />
-            <Route path="/profile" element={<div>Profile Page (Coming Soon)</div>} />
+            <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+            <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
+
+            {/* Protected Routes */}
+            <Route
+              path="/"
+              element={user ? <div>Welcome to ZTPAI Reviews</div> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/reviews"
+              element={user ? <ReviewList userId={user.id} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/add-review"
+              element={user ? <AddReview /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/profile"
+              element={user ? <Profile /> : <Navigate to="/login" />}
+            />
           </Routes>
         </Container>
       </div>

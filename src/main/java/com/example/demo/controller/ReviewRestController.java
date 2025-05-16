@@ -23,9 +23,9 @@ public class ReviewRestController {
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getReviewsByUserId(@PathVariable Integer userId) {
         List<Review> reviews = reviewRepository.findByUserID(userId);
-        return reviews.isEmpty() 
-            ? ResponseEntity.status(404).body(Map.of("error", "No reviews found for user ID " + userId))
-            : ResponseEntity.ok(reviews);
+        return reviews.isEmpty()
+                ? ResponseEntity.status(404).body(Map.of("error", "No reviews found for user ID " + userId))
+                : ResponseEntity.ok(reviews);
     }
 
     @PostMapping
@@ -38,8 +38,8 @@ public class ReviewRestController {
             Principal principal) {
         try {
             if (contentType == null || contentType.trim().isEmpty() ||
-                contentTitle == null || contentTitle.trim().isEmpty() ||
-                reviewDescription == null || reviewDescription.trim().isEmpty()) {
+                    contentTitle == null || contentTitle.trim().isEmpty() ||
+                    reviewDescription == null || reviewDescription.trim().isEmpty()) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Required fields must not be empty"));
             }
 
@@ -62,9 +62,9 @@ public class ReviewRestController {
                     .orElseThrow(() -> new RuntimeException("User not found"))
                     .getId();
 
-            Review review = new Review(userID, contentType.trim(), contentTitle.trim(), 
-                reviewTitle != null ? reviewTitle.trim() : null,
-                reviewDescription.trim(), fileName);
+            Review review = new Review(userID, contentType.trim(), contentTitle.trim(),
+                    reviewTitle != null ? reviewTitle.trim() : null,
+                    reviewDescription.trim(), fileName);
 
             Review savedReview = reviewRepository.save(review);
             return ResponseEntity.ok(savedReview);
@@ -80,11 +80,11 @@ public class ReviewRestController {
                     Integer userID = userRepository.findByUsername(principal.getName())
                             .orElseThrow(() -> new RuntimeException("User not found"))
                             .getId();
-                    
+
                     if (!review.getUserID().equals(userID)) {
                         return ResponseEntity.status(403).body(Map.of("error", "Not authorized to delete this review"));
                     }
-                    
+
                     reviewRepository.delete(review);
                     return ResponseEntity.ok(Map.of("message", "Review deleted successfully"));
                 })

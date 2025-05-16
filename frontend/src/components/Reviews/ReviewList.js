@@ -38,9 +38,9 @@ const ReviewList = ({ userId }) => {
                     <p>Type: {review.contentType}</p>
                     <p>Content Title: {review.contentTitle}</p>
                     {review.coverFile && (
-                        <img 
-                            src={`/uploads/${review.coverFile}`} 
-                            alt="Review cover" 
+                        <img
+                            src={`/uploads/${review.coverFile}`}
+                            alt="Review cover"
                             width="150"
                         />
                     )}

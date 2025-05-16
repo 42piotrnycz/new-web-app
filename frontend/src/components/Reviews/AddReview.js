@@ -65,7 +65,7 @@ const AddReview = () => {
     return (
         <div className="add-review">
             <h2>Add New Review</h2>
-            
+
             {error && <div className="error">{error}</div>}
             {success && <div className="success">Review added successfully!</div>}
 
