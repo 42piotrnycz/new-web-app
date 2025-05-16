@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Grid, CircularProgress, Alert } from '@mui/material';
+import {
+    Container,
+    Typography,
+    Card,
+    CardContent,
+    CardMedia,
+    Grid,
+    CircularProgress,
+    Alert,
+    Box
+} from '@mui/material';
 
 const ReviewList = ({ userId }) => {
     const [reviews, setReviews] = useState([]);
@@ -67,28 +77,41 @@ const ReviewList = ({ userId }) => {
             </Typography>
             <Grid container spacing={3}>
                 {reviews.map(review => (
-                    <Grid item xs={12} md={6} lg={4} key={review.reviewID}>
+                    <Grid item xs={12} sm={6} md={4} key={review.reviewID}>
                         <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                            <CardContent>
+                                <Typography 
+                                    variant="body2" 
+                                    color="text.secondary" 
+                                    sx={{ mb: 1, textTransform: 'uppercase' }}
+                                >
+                                    {review.contentType}
+                                </Typography>
+                                <Typography variant="h6" component="h2" gutterBottom>
+                                    {review.contentTitle}
+                                </Typography>
+                            </CardContent>
+                            
                             {review.coverFile && (
                                 <CardMedia
                                     component="img"
-                                    height="200"
-                                    image={`http://localhost:8080/uploads/${review.coverFile}`}
-                                    alt={review.reviewTitle || review.contentTitle}
-                                    sx={{ objectFit: 'cover' }}
+                                    sx={{
+                                        height: 200,
+                                        objectFit: 'cover',
+                                        width: '100%'
+                                    }}
+                                    image={`/uploads/${review.coverFile}`}
+                                    alt={review.contentTitle}
                                 />
                             )}
-                            <CardContent>
-                                <Typography variant="h6" component="h2" gutterBottom>
-                                    {review.reviewTitle || review.contentTitle}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    Type: {review.contentType}
-                                </Typography>
-                                <Typography variant="body2" color="text.secondary" gutterBottom>
-                                    Content: {review.contentTitle}
-                                </Typography>
-                                <Typography variant="body1">
+                            
+                            <CardContent sx={{ flexGrow: 1 }}>
+                                {review.reviewTitle && (
+                                    <Typography variant="h6" component="h3" gutterBottom>
+                                        {review.reviewTitle}
+                                    </Typography>
+                                )}
+                                <Typography variant="body1" color="text.primary" sx={{ whiteSpace: 'pre-line' }}>
                                     {review.reviewDescription}
                                 </Typography>
                             </CardContent>

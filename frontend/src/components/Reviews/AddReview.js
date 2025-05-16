@@ -1,6 +1,19 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+    Container,
+    Typography,
+    TextField,
+    Button,
+    Box,
+    MenuItem,
+    Alert,
+    Paper,
+    CircularProgress
+} from '@mui/material';
 
 const AddReview = () => {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         contentType: '',
         contentTitle: '',
@@ -10,6 +23,8 @@ const AddReview = () => {
     });
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -17,19 +32,28 @@ const AddReview = () => {
             ...prev,
             [name]: value
         }));
+        setError(null);
     };
 
     const handleFileChange = (e) => {
-        setFormData(prev => ({
-            ...prev,
-            cover: e.target.files[0]
-        }));
+        const file = e.target.files[0];
+        if (file) {
+            setFormData(prev => ({
+                ...prev,
+                cover: file
+            }));
+            // Create preview URL
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        }
+        setError(null);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
+        setLoading(true);
 
         const data = new FormData();
         Object.keys(formData).forEach(key => {
@@ -39,8 +63,12 @@ const AddReview = () => {
         });
 
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch('/api/reviews', {
                 method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
                 body: data
             });
 
@@ -50,6 +78,7 @@ const AddReview = () => {
             }
 
             setSuccess(true);
+            // Clear form
             setFormData({
                 contentType: '',
                 contentTitle: '',
@@ -57,90 +86,145 @@ const AddReview = () => {
                 reviewDescription: '',
                 cover: null
             });
+            setPreviewUrl(null);
+            
+            // Redirect after a short delay
+            setTimeout(() => {
+                navigate('/reviews');
+            }, 2000);
         } catch (err) {
             setError(err.message);
+        } finally {
+            setLoading(false);
         }
     };
 
+    const contentTypes = [
+        { value: 'game', label: 'Game' },
+        { value: 'movie', label: 'Movie' },
+        { value: 'tvseries', label: 'TV Series' },
+        { value: 'book', label: 'Book' }
+    ];
+
     return (
-        <div className="add-review">
-            <h2>Add New Review</h2>
+        <Container maxWidth="md">
+            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+                <Typography variant="h4" component="h1" gutterBottom align="center">
+                    Add New Review
+                </Typography>
 
-            {error && <div className="error">{error}</div>}
-            {success && <div className="success">Review added successfully!</div>}
+                {error && (
+                    <Alert severity="error" sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
+                
+                {success && (
+                    <Alert severity="success" sx={{ mb: 2 }}>
+                        Review added successfully! Redirecting to reviews page...
+                    </Alert>
+                )}
 
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>
-                        Content Type:*
-                        <select
-                            name="contentType"
-                            value={formData.contentType}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select type</option>
-                            <option value="game">Game</option>
-                            <option value="movie">Movie</option>
-                            <option value="tvseries">TV Series</option>
-                            <option value="book">Book</option>
-                        </select>
-                    </label>
-                </div>
+                <Box component="form" onSubmit={handleSubmit} noValidate>
+                    <TextField
+                        select
+                        fullWidth
+                        required
+                        margin="normal"
+                        name="contentType"
+                        label="Content Type"
+                        value={formData.contentType}
+                        onChange={handleChange}
+                        disabled={loading}
+                    >
+                        {contentTypes.map((option) => (
+                            <MenuItem key={option.value} value={option.value}>
+                                {option.label}
+                            </MenuItem>
+                        ))}
+                    </TextField>
 
-                <div>
-                    <label>
-                        Content Title:*
+                    <TextField
+                        fullWidth
+                        required
+                        margin="normal"
+                        name="contentTitle"
+                        label="Content Title"
+                        value={formData.contentTitle}
+                        onChange={handleChange}
+                        disabled={loading}
+                    />
+
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        name="reviewTitle"
+                        label="Review Title"
+                        value={formData.reviewTitle}
+                        onChange={handleChange}
+                        disabled={loading}
+                    />
+
+                    <TextField
+                        fullWidth
+                        required
+                        margin="normal"
+                        name="reviewDescription"
+                        label="Review Description"
+                        value={formData.reviewDescription}
+                        onChange={handleChange}
+                        multiline
+                        rows={5}
+                        disabled={loading}
+                    />
+
+                    <Box sx={{ mt: 2, mb: 2 }}>
                         <input
-                            type="text"
-                            name="contentTitle"
-                            value={formData.contentTitle}
-                            onChange={handleChange}
-                            required
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <label>
-                        Review Title:
-                        <input
-                            type="text"
-                            name="reviewTitle"
-                            value={formData.reviewTitle}
-                            onChange={handleChange}
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <label>
-                        Review Description:*
-                        <textarea
-                            name="reviewDescription"
-                            value={formData.reviewDescription}
-                            onChange={handleChange}
-                            required
-                            rows="5"
-                        />
-                    </label>
-                </div>
-
-                <div>
-                    <label>
-                        Cover Image:
-                        <input
-                            type="file"
-                            name="cover"
-                            onChange={handleFileChange}
                             accept="image/*"
+                            id="cover-file"
+                            type="file"
+                            style={{ display: 'none' }}
+                            onChange={handleFileChange}
+                            disabled={loading}
                         />
-                    </label>
-                </div>
+                        <label htmlFor="cover-file">
+                            <Button
+                                variant="outlined"
+                                component="span"
+                                disabled={loading}
+                                fullWidth
+                            >
+                                Upload Cover Image
+                            </Button>
+                        </label>
+                        {previewUrl && (
+                            <Box sx={{ mt: 2, textAlign: 'center' }}>
+                                <img
+                                    src={previewUrl}
+                                    alt="Cover preview"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '200px',
+                                        objectFit: 'contain'
+                                    }}
+                                />
+                            </Box>
+                        )}
+                    </Box>
 
-                <button type="submit">Submit Review</button>
-            </form>
-        </div>
+                    <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        size="large"
+                        disabled={loading}
+                        sx={{ mt: 2 }}
+                    >
+                        {loading ? <CircularProgress size={24} /> : 'Submit Review'}
+                    </Button>
+                </Box>
+            </Paper>
+        </Container>
     );
 };
 
