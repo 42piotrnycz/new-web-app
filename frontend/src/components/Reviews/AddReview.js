@@ -87,7 +87,7 @@ const AddReview = () => {
                 cover: null
             });
             setPreviewUrl(null);
-            
+
             // Redirect after a short delay
             setTimeout(() => {
                 navigate('/reviews');
@@ -118,7 +118,7 @@ const AddReview = () => {
                         {error}
                     </Alert>
                 )}
-                
+
                 {success && (
                     <Alert severity="success" sx={{ mb: 2 }}>
                         Review added successfully! Redirecting to reviews page...

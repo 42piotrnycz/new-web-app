@@ -13,7 +13,7 @@ import java.util.Date;
 public class JwtUtil {
     private static final String SECRET_KEY = "your_very_long_and_secure_secret_key_for_jwt_token_generation_123456789";
     private static final long EXPIRATION_TIME = 86400000; // 24 hours
-    
+
     private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
     public String generateToken(String username, String role) {

@@ -101,9 +101,9 @@ const ReviewDetail = () => {
 
             <Card>
                 <CardContent>
-                    <Typography 
-                        variant="body2" 
-                        color="text.secondary" 
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
                         sx={{ mb: 1, textTransform: 'uppercase' }}
                     >
                         {review.contentType}
@@ -132,9 +132,9 @@ const ReviewDetail = () => {
                             {review.reviewTitle}
                         </Typography>
                     )}
-                    <Typography 
-                        variant="body1" 
-                        sx={{ 
+                    <Typography
+                        variant="body1"
+                        sx={{
                             whiteSpace: 'pre-line',
                             mt: 2,
                             fontSize: '1.1rem',

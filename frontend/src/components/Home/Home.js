@@ -13,6 +13,10 @@ import {
     Button
 } from '@mui/material';
 
+const CARD_HEIGHT = 500;
+const CARD_WIDTH = 345;
+const IMAGE_HEIGHT = 200;
+
 const Home = () => {
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
@@ -30,17 +34,17 @@ const Home = () => {
                         'Accept': 'application/json'
                     }
                 });
-                
+
                 if (!response.ok) {
                     const data = await response.json();
                     throw new Error(data.error || 'Failed to fetch reviews');
                 }
-                
+
                 const data = await response.json();
                 setReviews(data);
 
                 // Fetch usernames for all reviews
-                const usernamePromises = data.map(review => 
+                const usernamePromises = data.map(review =>
                     fetch(`/api/users/${review.userID}`, {
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -86,20 +90,21 @@ const Home = () => {
     }
 
     return (
-        <Container sx={{ mt: 4 }}>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
                 Welcome to REviewer 2.0
             </Typography>
             <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
                 Latest Reviews
             </Typography>
-            <Grid container spacing={3}>
+            <Grid container spacing={3} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
                 {reviews.map(review => (
-                    <Grid item xs={12} sm={6} md={4} key={review.reviewID}>
-                        <Card 
-                            sx={{ 
-                                height: '100%', 
-                                display: 'flex', 
+                    <Grid item key={review.reviewID} sx={{ width: CARD_WIDTH, m: 1 }}>
+                        <Card
+                            sx={{
+                                width: CARD_WIDTH,
+                                height: CARD_HEIGHT,
+                                display: 'flex',
                                 flexDirection: 'column',
                                 cursor: 'pointer',
                                 '&:hover': {
@@ -110,24 +115,27 @@ const Home = () => {
                             }}
                             onClick={() => handleReviewClick(review.reviewID)}
                         >
-                            <CardContent>
+                            <CardContent sx={{ p: 2, pb: 0, flex: '0 0 auto' }}>
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                    <Typography 
-                                        variant="body2" 
+                                    <Typography
+                                        variant="body2"
                                         color="text.secondary"
-                                        sx={{ textTransform: 'uppercase' }}
+                                        sx={{
+                                            textTransform: 'uppercase',
+                                            height: 24
+                                        }}
                                     >
                                         {review.contentType}
                                     </Typography>
-                                    <Typography 
-                                        variant="body2" 
+                                    <Typography
+                                        variant="body2"
                                         color="text.secondary"
                                         component={Button}
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             navigate(`/user/${review.userID}/reviews`);
                                         }}
-                                        sx={{ 
+                                        sx={{
                                             textTransform: 'none',
                                             p: 0,
                                             minWidth: 'auto',
@@ -140,40 +148,82 @@ const Home = () => {
                                         by {reviewUsernames[review.userID] || '...'}
                                     </Typography>
                                 </Box>
-                                <Typography variant="h6" component="h2" gutterBottom>
-                                    {review.contentTitle}
-                                </Typography>
-                            </CardContent>
-                            
-                            {review.coverFile && (
-                                <CardMedia
-                                    component="img"
+                                <Typography
+                                    variant="h6"
+                                    component="h2"
                                     sx={{
-                                        height: 200,
-                                        objectFit: 'cover',
-                                        width: '100%'
-                                    }}
-                                    image={`/uploads/${review.coverFile}`}
-                                    alt={review.contentTitle}
-                                />
-                            )}
-                            
-                            <CardContent sx={{ flexGrow: 1 }}>
-                                {review.reviewTitle && (
-                                    <Typography variant="h6" component="h3" gutterBottom>
-                                        {review.reviewTitle}
-                                    </Typography>
-                                )}
-                                <Typography 
-                                    variant="body1" 
-                                    color="text.primary" 
-                                    sx={{ 
-                                        whiteSpace: 'pre-line',
+                                        mb: 1,
                                         overflow: 'hidden',
                                         textOverflow: 'ellipsis',
                                         display: '-webkit-box',
-                                        WebkitLineClamp: 3,
-                                        WebkitBoxOrient: 'vertical'
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        lineHeight: 1.2,
+                                        height: 48
+                                    }}
+                                >
+                                    {review.contentTitle}
+                                </Typography>
+                            </CardContent>
+
+                            <Box sx={{ width: '100%', height: IMAGE_HEIGHT, position: 'relative' }}>
+                                {review.coverFile ? (
+                                    <CardMedia
+                                        component="img"
+                                        sx={{
+                                            height: '100%',
+                                            width: '100%',
+                                            objectFit: 'cover'
+                                        }}
+                                        image={`/uploads/${review.coverFile}`}
+                                        alt={review.contentTitle}
+                                    />
+                                ) : (
+                                    <Box
+                                        sx={{
+                                            height: '100%',
+                                            width: '100%',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            bgcolor: 'grey.200',
+                                            color: 'text.secondary'
+                                        }}
+                                    >
+                                        <Typography>No image available</Typography>
+                                    </Box>
+                                )}
+                            </Box>
+
+                            <CardContent sx={{ p: 2, pt: 1, flex: '1 0 auto' }}>
+                                {review.reviewTitle && (
+                                    <Typography
+                                        variant="h6"
+                                        component="h3"
+                                        sx={{
+                                            mb: 1,
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 1,
+                                            WebkitBoxOrient: 'vertical',
+                                            lineHeight: 1.2,
+                                            height: 24
+                                        }}
+                                    >
+                                        {review.reviewTitle}
+                                    </Typography>
+                                )}
+                                <Typography
+                                    variant="body1"
+                                    color="text.primary"
+                                    sx={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 4,
+                                        WebkitBoxOrient: 'vertical',
+                                        height: 96
                                     }}
                                 >
                                     {review.reviewDescription}
