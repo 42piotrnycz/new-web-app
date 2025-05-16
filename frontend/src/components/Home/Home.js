@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     Container,
     Typography,
@@ -9,43 +9,22 @@ import {
     Grid,
     CircularProgress,
     Alert,
-    Box
+    Box,
+    Button
 } from '@mui/material';
 
-const ReviewList = ({ userId: propsUserId }) => {
-    const { userId: paramsUserId } = useParams();
-    const userId = paramsUserId || propsUserId;
+const Home = () => {
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [username, setUsername] = useState('');
+    const [reviewUsernames, setReviewUsernames] = useState({});
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchUser = async () => {
-            if (!userId) return;
+        const fetchLatestReviews = async () => {
             try {
                 const token = localStorage.getItem('token');
-                const response = await fetch(`/api/users/${userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    setUsername(data.username);
-                }
-            } catch (err) {
-                console.error('Error fetching user:', err);
-            }
-        };
-
-        const fetchReviews = async () => {
-            if (!userId) return;
-            try {
-                const token = localStorage.getItem('token');
-                const response = await fetch(`/api/reviews/user/${userId}`, {
+                const response = await fetch('/api/reviews/latest', {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
@@ -59,6 +38,23 @@ const ReviewList = ({ userId: propsUserId }) => {
                 
                 const data = await response.json();
                 setReviews(data);
+
+                // Fetch usernames for all reviews
+                const usernamePromises = data.map(review => 
+                    fetch(`/api/users/${review.userID}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': 'application/json'
+                        }
+                    }).then(res => res.json())
+                );
+
+                const users = await Promise.all(usernamePromises);
+                const usernameMap = {};
+                data.forEach((review, index) => {
+                    usernameMap[review.userID] = users[index].username;
+                });
+                setReviewUsernames(usernameMap);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -66,10 +62,8 @@ const ReviewList = ({ userId: propsUserId }) => {
             }
         };
 
-        setLoading(true);
-        fetchUser();
-        fetchReviews();
-    }, [userId]);
+        fetchLatestReviews();
+    }, []);
 
     const handleReviewClick = (reviewId) => {
         navigate(`/review/${reviewId}`);
@@ -91,18 +85,13 @@ const ReviewList = ({ userId: propsUserId }) => {
         );
     }
 
-    if (reviews.length === 0) {
-        return (
-            <Container sx={{ mt: 4 }}>
-                <Alert severity="info">No reviews found. Create your first review!</Alert>
-            </Container>
-        );
-    }
-
     return (
         <Container sx={{ mt: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                {paramsUserId ? `${username}'s Reviews` : 'My Reviews'}
+            <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
+                Welcome to REviewer 2.0
+            </Typography>
+            <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+                Latest Reviews
             </Typography>
             <Grid container spacing={3}>
                 {reviews.map(review => (
@@ -122,13 +111,35 @@ const ReviewList = ({ userId: propsUserId }) => {
                             onClick={() => handleReviewClick(review.reviewID)}
                         >
                             <CardContent>
-                                <Typography 
-                                    variant="body2" 
-                                    color="text.secondary" 
-                                    sx={{ mb: 1, textTransform: 'uppercase' }}
-                                >
-                                    {review.contentType}
-                                </Typography>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                    <Typography 
+                                        variant="body2" 
+                                        color="text.secondary"
+                                        sx={{ textTransform: 'uppercase' }}
+                                    >
+                                        {review.contentType}
+                                    </Typography>
+                                    <Typography 
+                                        variant="body2" 
+                                        color="text.secondary"
+                                        component={Button}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/user/${review.userID}/reviews`);
+                                        }}
+                                        sx={{ 
+                                            textTransform: 'none',
+                                            p: 0,
+                                            minWidth: 'auto',
+                                            '&:hover': {
+                                                background: 'none',
+                                                textDecoration: 'underline'
+                                            }
+                                        }}
+                                    >
+                                        by {reviewUsernames[review.userID] || '...'}
+                                    </Typography>
+                                </Box>
                                 <Typography variant="h6" component="h2" gutterBottom>
                                     {review.contentTitle}
                                 </Typography>
@@ -176,4 +187,4 @@ const ReviewList = ({ userId: propsUserId }) => {
     );
 };
 
-export default ReviewList;
+export default Home;

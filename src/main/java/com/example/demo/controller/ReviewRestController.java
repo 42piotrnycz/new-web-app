@@ -28,6 +28,19 @@ public class ReviewRestController {
                 : ResponseEntity.ok(reviews);
     }
 
+    @GetMapping("/{reviewId}")
+    public ResponseEntity<?> getReviewById(@PathVariable Integer reviewId) {
+        return reviewRepository.findById(reviewId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<?> getLatestReviews() {
+        List<Review> reviews = reviewRepository.findTop25ByOrderByReviewIDDesc();
+        return ResponseEntity.ok(reviews);
+    }
+
     @PostMapping
     public ResponseEntity<?> createReview(
             @RequestParam(required = false) MultipartFile cover,

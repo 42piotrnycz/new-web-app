@@ -1,7 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
+import Home from './components/Home/Home';
 import ReviewList from './components/Reviews/ReviewList';
+import ReviewDetail from './components/Reviews/ReviewDetail';
 import AddReview from './components/Reviews/AddReview';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
@@ -42,7 +44,7 @@ function App() {
         <AppBar position="static">
           <Toolbar>
             <Typography variant="h6" style={{ flexGrow: 1 }}>
-              ZTPAI Reviews
+              REviewer 2.0
             </Typography>
             {user ? (
               <>
@@ -79,15 +81,23 @@ function App() {
           <Routes>
             <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
             <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
-
+            
             {/* Protected Routes */}
             <Route
               path="/"
-              element={user ? <div>Welcome to ZTPAI Reviews</div> : <Navigate to="/login" />}
+              element={user ? <Home /> : <Navigate to="/login" />}
             />
             <Route
               path="/reviews"
               element={user ? <ReviewList userId={user.id} /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/review/:reviewId"
+              element={user ? <ReviewDetail /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/user/:userId/reviews"
+              element={user ? <ReviewList /> : <Navigate to="/login" />}
             />
             <Route
               path="/add-review"
