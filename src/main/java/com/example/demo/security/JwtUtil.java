@@ -5,13 +5,16 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Slf4j
 @Component
 public class JwtUtil {
-    private final SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    private static final long EXPIRATION_TIME = 3600000; // 1 hour
+    private static final String SECRET_KEY = "your_very_long_and_secure_secret_key_for_jwt_token_generation_123456789";
+    private static final long EXPIRATION_TIME = 86400000; // 24 hours
+
+    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
 
     public String generateToken(String username, String role) {
         return Jwts.builder()
@@ -39,26 +42,18 @@ public class JwtUtil {
 
     public boolean validateToken(String token, String username) {
         try {
-            String tokenUsername = extractUsername(token);
-            return username.equals(tokenUsername) && !isTokenExpired(token);
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token);
+
+            String tokenUsername = claims.getBody().getSubject();
+            Date expiration = claims.getBody().getExpiration();
+
+            return username.equals(tokenUsername) && !expiration.before(new Date());
         } catch (JwtException e) {
             log.error("Token validation error: {}", e.getMessage());
             return false;
-        }
-    }
-
-    private boolean isTokenExpired(String token) {
-        try {
-            Date expiration = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .getExpiration();
-            return expiration.before(new Date());
-        } catch (JwtException e) {
-            log.error("Token expiration check error: {}", e.getMessage());
-            return true;
         }
     }
 }
