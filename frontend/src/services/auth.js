@@ -12,12 +12,11 @@ const login = async (username, password) => {
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.error || 'Failed to login');
-        }
-
-        const data = await response.json();
+        }        const data = await response.json();
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', data.username);
+        localStorage.setItem('role', data.role);
         return data;
     } catch (error) {
         console.error('Login error:', error);
@@ -52,6 +51,7 @@ const logout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
     localStorage.removeItem('username');
+    localStorage.removeItem('role');
 };
 
 const getCurrentUser = async () => {
