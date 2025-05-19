@@ -61,21 +61,38 @@ const getCurrentUser = async () => {
     }
 
     try {
-        const response = await fetch('/api/users/me', {
+    const response = await fetch('/api/users/me', {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         });
 
-        if (!response.ok) {
+        try {
+            const textData = await response.text();
+            if (!textData) {
+                throw new Error('Empty response');
+            }
+
+            const data = JSON.parse(textData);
+            
+            if (!response.ok) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                localStorage.removeItem('role');
+                return null;
+            }
+
+            return data;
+        } catch (error) {
+            console.error('Error parsing user data:', error);
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
             localStorage.removeItem('username');
+            localStorage.removeItem('role');
             return null;
         }
-
-        return response.json();
     } catch (error) {
         console.error('Get current user error:', error);
         localStorage.removeItem('token');

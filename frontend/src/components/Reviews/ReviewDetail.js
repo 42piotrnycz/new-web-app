@@ -5,11 +5,14 @@ import {
     Typography,
     Card,
     CardContent,
-    CardMedia,
-    CircularProgress,
+    CardMedia,    CircularProgress,
     Alert,
     Box,
-    Button
+    Button,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions
 } from '@mui/material';
 
 const ReviewDetail = () => {
@@ -19,8 +22,27 @@ const ReviewDetail = () => {
     const [user, setUser] = useState(null);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [success, setSuccess] = useState(null);    useEffect(() => {
+        const fetchCurrentUser = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                const response = await fetch('/api/users/me', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                if (response.ok) {
+                    const userData = await response.json();
+                    setCurrentUser(userData);
+                }
+            } catch (err) {
+                console.error('Error fetching current user:', err);
+            }
+        };
 
-    useEffect(() => {
         const fetchReviewDetails = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -56,11 +78,37 @@ const ReviewDetail = () => {
                 setError(err.message);
             } finally {
                 setLoading(false);
-            }
-        };
+            }        };
 
+        fetchCurrentUser();
         fetchReviewDetails();
     }, [reviewId]);
+
+    const handleDelete = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`/api/reviews/${reviewId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to delete review');
+            }
+
+            setSuccess('Review deleted successfully');
+            setTimeout(() => {
+                navigate('/reviews');
+            }, 2000);
+        } catch (err) {
+            setError(err.message);
+        }
+        setDeleteDialogOpen(false);
+    };
 
     if (loading) {
         return (
@@ -97,10 +145,32 @@ const ReviewDetail = () => {
                 >
                     {user?.username}
                 </Button>
-            </Box>
+            </Box>            {success && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                    {success}
+                </Alert>
+            )}
 
             <Card>
                 <CardContent>
+                    {currentUser && (currentUser.id === review.userID || currentUser.role === 'ROLE_ADMIN') && (
+                        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => navigate(`/review/edit/${reviewId}`)}
+                            >
+                                Edit Review
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => setDeleteDialogOpen(true)}
+                            >
+                                Delete Review
+                            </Button>
+                        </Box>
+                    )}
                     <Typography
                         variant="body2"
                         color="text.secondary"

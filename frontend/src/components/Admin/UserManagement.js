@@ -26,7 +26,9 @@ const UserManagement = () => {
     const [error, setError] = useState(null);
     const [selectedUser, setSelectedUser] = useState(null);
     const [dialogOpen, setDialogOpen] = useState(false);
-    const [selectedRole, setSelectedRole] = useState('');    const fetchUsers = async () => {
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [deleteSuccess, setDeleteSuccess] = useState(null);
+    const [selectedRole, setSelectedRole] = useState('');const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -40,18 +42,31 @@ const UserManagement = () => {
                 }
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to fetch users');
+            let errorData;
+            let data;
+            
+            try {
+                const textData = await response.text();
+                data = textData ? JSON.parse(textData) : null;
+            } catch (parseError) {
+                console.error('JSON parse error:', parseError);
+                throw new Error('Invalid response format from server');
             }
 
-            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data?.error || 'Failed to fetch users');
+            }
+
+            if (!data || !Array.isArray(data)) {
+                throw new Error('Invalid data format received from server');
+            }
+
             setUsers(data);
-            setError(null); // Clear any previous errors
+            setError(null);
         } catch (err) {
             console.error('Error fetching users:', err);
             setError(err.message);
-            setUsers([]); // Clear users on error
+            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -59,13 +74,53 @@ const UserManagement = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);
-
-    const handleRoleChange = async (user) => {
+    }, []);    const handleRoleChange = async (user) => {
         setSelectedUser(user);
         setSelectedRole(user.role);
         setDialogOpen(true);
-    };    const handleUpdateRole = async () => {
+    };
+
+    const handleDeleteClick = (user) => {
+        setSelectedUser(user);
+        setDeleteDialogOpen(true);
+    };
+
+    const handleDeleteConfirm = async () => {        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('No authentication token found');
+            }
+
+            const response = await fetch(`/api/users/${selectedUser.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Accept': 'application/json'
+                }
+            });            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to delete user');
+            }
+
+            // Remove the user from the list and show success message with review count
+            setUsers(users.filter(user => user.id !== selectedUser.id));
+            setError(null);
+            setDeleteDialogOpen(false);
+
+            // Show success alert with auto-hide after 5 seconds
+            setDeleteSuccess({
+                message: result.message,
+                reviewsDeleted: result.reviewsDeleted
+            });
+
+            setTimeout(() => {
+                setDeleteSuccess(null);
+            }, 5000);
+        } catch (err) {
+            console.error('Error deleting user:', err);
+            setError(err.message);
+        }
+    };const handleUpdateRole = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -116,6 +171,12 @@ const UserManagement = () => {
                 </Alert>
             )}
 
+            {deleteSuccess && (
+                <Alert severity="success" sx={{ mb: 2 }}>
+                    {deleteSuccess.message} ({deleteSuccess.reviewsDeleted} reviews deleted)
+                </Alert>
+            )}
+
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -133,14 +194,23 @@ const UserManagement = () => {
                                 <TableCell>{user.id}</TableCell>
                                 <TableCell>{user.username}</TableCell>
                                 <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.role}</TableCell>
-                                <TableCell>
+                                <TableCell>{user.role}</TableCell>                                <TableCell>
                                     <Button
                                         variant="contained"
                                         onClick={() => handleRoleChange(user)}
+                                        sx={{ mr: 1 }}
                                     >
                                         Change Role
                                     </Button>
+                                    {user.role !== 'ROLE_ADMIN' && (
+                                        <Button
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleDeleteClick(user)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    )}
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -167,6 +237,18 @@ const UserManagement = () => {
                     <Button onClick={() => setDialogOpen(false)}>Cancel</Button>
                     <Button onClick={handleUpdateRole} color="primary">
                         Update
+                    </Button>
+                </DialogActions>            </Dialog>
+
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>Confirm Delete User</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to delete user "{selectedUser?.username}"? This action cannot be undone.
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleDeleteConfirm} color="error">
+                        Delete
                     </Button>
                 </DialogActions>
             </Dialog>

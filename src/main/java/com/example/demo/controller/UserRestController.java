@@ -1,11 +1,14 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.User;
+import com.example.demo.model.Review;
 import com.example.demo.repository.UserRepository;
+import com.example.demo.repository.ReviewRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.io.File;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,8 +30,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "http://localhost:3000")
-public class UserRestController {
-    private final UserRepository userRepository;
+public class UserRestController {    private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
@@ -166,5 +169,42 @@ public class UserRestController {
             .collect(Collectors.toList());
         
         return ResponseEntity.ok(response);
+    }    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        return userRepository.findById(id)
+            .map(user -> {
+                // Prevent self-deletion and admin deletion
+                if (user.getRole() == User.Role.ROLE_ADMIN) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Cannot delete admin users"));
+                }                try {
+                    // Delete all reviews by this user first
+                    List<Review> userReviews = reviewRepository.findByUserID(user.getId());
+                    
+                    // Delete cover files first
+                    for (Review review : userReviews) {
+                        if (review.getCoverFile() != null && !review.getCoverFile().isEmpty()) {
+                            File coverFile = new File("uploads", review.getCoverFile());
+                            if (coverFile.exists()) {
+                                coverFile.delete();
+                            }
+                        }
+                    }
+                    
+                    // Then delete the reviews from database
+                    reviewRepository.deleteAll(userReviews);
+
+                    // Finally delete the user
+                    userRepository.delete(user);
+                    return ResponseEntity.ok(Map.of(
+                        "message", "User and all their reviews deleted successfully",
+                        "reviewsDeleted", userReviews.size()
+                    ));
+                } catch (Exception e) {
+                    return ResponseEntity.internalServerError()
+                        .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
+                }
+            })
+            .orElse(ResponseEntity.notFound().build());
     }
 }
