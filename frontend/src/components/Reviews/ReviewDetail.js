@@ -213,8 +213,20 @@ const ReviewDetail = () => {
                     >
                         {review.reviewDescription}
                     </Typography>
-                </CardContent>
-            </Card>
+                </CardContent>            </Card>
+
+            <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogTitle>Confirm Delete Review</DialogTitle>
+                <DialogContent>
+                    Are you sure you want to delete this review? This action cannot be undone.
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
+                    <Button onClick={handleDelete} color="error">
+                        Delete
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Container>
     );
 };

@@ -6,6 +6,7 @@ import AdminPanel from './components/Admin/AdminPanel';
 import ReviewList from './components/Reviews/ReviewList';
 import ReviewDetail from './components/Reviews/ReviewDetail';
 import AddReview from './components/Reviews/AddReview';
+import EditReview from './components/Reviews/EditReview';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Profile from './components/Profile/Profile';
@@ -123,6 +124,10 @@ function App() {  const [user, setUser] = useState(null);
             />            <Route
               path="/review/:reviewId"
               element={user ? <ReviewDetail /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/review/edit/:reviewId"
+              element={user ? <EditReview /> : <Navigate to="/login" />}
             />
             <Route
               path="/admin/*"

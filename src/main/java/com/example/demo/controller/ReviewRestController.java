@@ -16,6 +16,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/reviews")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:3000")
 public class ReviewRestController {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
@@ -78,6 +79,70 @@ public class ReviewRestController {
             Review review = new Review(userID, contentType.trim(), contentTitle.trim(),
                     reviewTitle != null ? reviewTitle.trim() : null,
                     reviewDescription.trim(), fileName);
+
+            Review savedReview = reviewRepository.save(review);
+            return ResponseEntity.ok(savedReview);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<?> updateReview(
+            @PathVariable Integer reviewId,
+            @RequestParam(required = false) MultipartFile coverFile,
+            @RequestParam String contentType,
+            @RequestParam String contentTitle,
+            @RequestParam(required = false) String reviewTitle,
+            @RequestParam String reviewDescription,
+            @RequestParam(defaultValue = "false") boolean keepExistingCover,
+            Principal principal) {
+        try {
+            Review review = reviewRepository.findById(reviewId)
+                    .orElseThrow(() -> new RuntimeException("Review not found"));
+
+            Integer userID = userRepository.findByUsername(principal.getName())
+                    .orElseThrow(() -> new RuntimeException("User not found"))
+                    .getId();
+
+            // Check if the user is the owner of the review
+            if (!review.getUserID().equals(userID)) {
+                return ResponseEntity.status(403).body(Map.of("error", "Not authorized to update this review"));
+            }
+
+            // Handle cover file
+            String fileName = review.getCoverFile(); // Keep existing cover file name by default
+            if (!keepExistingCover && coverFile != null && !coverFile.isEmpty()) {
+                // Delete old cover file if it exists
+                if (review.getCoverFile() != null && !review.getCoverFile().isEmpty()) {
+                    File oldCover = new File(new File("uploads").getAbsolutePath(), review.getCoverFile());
+                    if (oldCover.exists()) {
+                        oldCover.delete();
+                    }
+                }
+
+                // Save new cover file
+                String uploadDir = new File("uploads").getAbsolutePath();
+                new File(uploadDir).mkdirs();
+
+                String extension = "";
+                String originalFilename = coverFile.getOriginalFilename();
+                if (originalFilename != null && originalFilename.contains(".")) {
+                    extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
+                }
+
+                fileName = UUID.randomUUID().toString() + extension;
+                coverFile.transferTo(new File(uploadDir, fileName));
+            }
+
+            // Update review properties
+            review.setContentType(contentType.trim());
+            review.setContentTitle(contentTitle.trim());
+            review.setReviewTitle(reviewTitle != null ? reviewTitle.trim() : null);
+            review.setReviewDescription(reviewDescription.trim());
+            if (!keepExistingCover) {
+                review.setCoverFile(fileName);
+            }
 
             Review savedReview = reviewRepository.save(review);
             return ResponseEntity.ok(savedReview);
