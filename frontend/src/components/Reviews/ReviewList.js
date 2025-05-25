@@ -84,11 +84,11 @@ const ReviewList = ({ userId: propsUserId }) => {
 
     useEffect(() => {
         if (!reviews) return;
-        
+
         if (selectedType === 'All') {
             setFilteredReviews(reviews);
         } else {
-            const filtered = reviews.filter(review => 
+            const filtered = reviews.filter(review =>
                 review.contentType.toLowerCase() === selectedType.toLowerCase()
             );
             setFilteredReviews(filtered);
@@ -134,7 +134,7 @@ const ReviewList = ({ userId: propsUserId }) => {
             <Typography variant="h4" component="h1" gutterBottom>
                 {paramsUserId ? `${username}'s Reviews` : 'My Reviews'}
             </Typography>
-            
+
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
                 <ToggleButtonGroup
                     value={selectedType}
@@ -150,8 +150,8 @@ const ReviewList = ({ userId: propsUserId }) => {
                     }}
                 >
                     {CONTENT_TYPES.map((type) => (
-                        <ToggleButton 
-                            key={type} 
+                        <ToggleButton
+                            key={type}
                             value={type}
                         >
                             {type}

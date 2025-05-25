@@ -42,16 +42,16 @@ const AdminPanel = () => {
             </Typography>
 
             <Paper sx={{ mt: 3 }}>                <Tabs
-                    value={currentTab()}
-                    onChange={handleChange}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    centered
-                >
-                    <Tab label="User Management" />
-                    <Tab label="User Logs" />
-                    <Tab label="Review Logs" />
-                </Tabs>
+                value={currentTab()}
+                onChange={handleChange}
+                indicatorColor="primary"
+                textColor="primary"
+                centered
+            >
+                <Tab label="User Management" />
+                <Tab label="User Logs" />
+                <Tab label="Review Logs" />
+            </Tabs>
 
                 <Box sx={{ p: 3 }}>
                     <Routes>

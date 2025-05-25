@@ -5,7 +5,7 @@ import {
     Typography,
     Card,
     CardContent,
-    CardMedia,    CircularProgress,
+    CardMedia, CircularProgress,
     Alert,
     Box,
     Button,
@@ -24,7 +24,7 @@ const ReviewDetail = () => {
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [success, setSuccess] = useState(null);    useEffect(() => {
+    const [success, setSuccess] = useState(null); useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
                 const token = localStorage.getItem('token');
@@ -78,7 +78,8 @@ const ReviewDetail = () => {
                 setError(err.message);
             } finally {
                 setLoading(false);
-            }        };
+            }
+        };
 
         fetchCurrentUser();
         fetchReviewDetails();

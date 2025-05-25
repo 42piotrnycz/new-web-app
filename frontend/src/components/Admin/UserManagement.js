@@ -28,7 +28,7 @@ const UserManagement = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(null);
-    const [selectedRole, setSelectedRole] = useState('');const fetchUsers = async () => {
+    const [selectedRole, setSelectedRole] = useState(''); const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -44,7 +44,7 @@ const UserManagement = () => {
 
             let errorData;
             let data;
-            
+
             try {
                 const textData = await response.text();
                 data = textData ? JSON.parse(textData) : null;
@@ -74,7 +74,7 @@ const UserManagement = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []);    const handleRoleChange = async (user) => {
+    }, []); const handleRoleChange = async (user) => {
         setSelectedUser(user);
         setSelectedRole(user.role);
         setDialogOpen(true);
@@ -85,7 +85,8 @@ const UserManagement = () => {
         setDeleteDialogOpen(true);
     };
 
-    const handleDeleteConfirm = async () => {        try {
+    const handleDeleteConfirm = async () => {
+        try {
             const token = localStorage.getItem('token');
             if (!token) {
                 throw new Error('No authentication token found');
@@ -97,7 +98,7 @@ const UserManagement = () => {
                     'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 }
-            });            const result = await response.json();
+            }); const result = await response.json();
             if (!response.ok) {
                 throw new Error(result.error || 'Failed to delete user');
             }
@@ -120,7 +121,7 @@ const UserManagement = () => {
             console.error('Error deleting user:', err);
             setError(err.message);
         }
-    };const handleUpdateRole = async () => {
+    }; const handleUpdateRole = async () => {
         try {
             const token = localStorage.getItem('token');
             if (!token) {
@@ -143,7 +144,7 @@ const UserManagement = () => {
             }
 
             const updatedUser = await response.json();
-            
+
             // Update the users list with the returned updated user data
             const updatedUsers = users.map(user =>
                 user.id === selectedUser.id ? { ...user, role: updatedUser.role } : user
@@ -163,7 +164,7 @@ const UserManagement = () => {
 
     if (error) {
         return <Alert severity="error">{error}</Alert>;
-    }    return (
+    } return (
         <>
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>

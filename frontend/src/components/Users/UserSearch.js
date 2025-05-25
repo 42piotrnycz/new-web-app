@@ -23,7 +23,7 @@ const UserSearch = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
-    
+
     const debouncedSearch = useCallback(
         debounce((term) => {
             if (term.trim()) {
@@ -51,10 +51,10 @@ const UserSearch = () => {
             setUsers([]);
             return;
         }
-        
+
         setLoading(true);
         setError(null);
-        
+
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/users/search?username=${encodeURIComponent(term)}`, {
@@ -104,7 +104,7 @@ const UserSearch = () => {
             <Typography variant="h4" component="h1" gutterBottom align="center">
                 Search Users
             </Typography>
-            
+
             <Paper sx={{ p: 2, mb: 2 }}>
                 <TextField
                     fullWidth

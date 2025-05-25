@@ -52,10 +52,10 @@ const Profile = () => {
 
             const result = await response.json();
             setSuccess('Profile deleted successfully. Redirecting to login...');
-            
+
             // Clear authentication
             localStorage.removeItem('token');
-            
+
             // Redirect after showing success message
             setTimeout(() => {
                 navigate('/login');
@@ -84,7 +84,7 @@ const Profile = () => {
                 </Box>
             </Container>
         );
-    }    return (
+    } return (
         <Container maxWidth="sm">
             <Box sx={{ mt: 4 }}>
                 {success && (

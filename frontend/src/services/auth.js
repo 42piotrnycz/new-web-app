@@ -12,7 +12,7 @@ const login = async (username, password) => {
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.error || 'Failed to login');
-        }        const data = await response.json();
+        } const data = await response.json();
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', data.username);
@@ -61,7 +61,7 @@ const getCurrentUser = async () => {
     }
 
     try {
-    const response = await fetch('/api/users/me', {
+        const response = await fetch('/api/users/me', {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
@@ -75,7 +75,7 @@ const getCurrentUser = async () => {
             }
 
             const data = JSON.parse(textData);
-            
+
             if (!response.ok) {
                 localStorage.removeItem('token');
                 localStorage.removeItem('userId');

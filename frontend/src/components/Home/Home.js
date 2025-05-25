@@ -83,7 +83,7 @@ const Home = () => {
         if (selectedType === 'All') {
             setFilteredReviews(reviews);
         } else {
-            const filtered = reviews.filter(review => 
+            const filtered = reviews.filter(review =>
                 review.contentType.toLowerCase() === selectedType.toLowerCase()
             );
             setFilteredReviews(filtered);
@@ -140,8 +140,8 @@ const Home = () => {
                     }}
                 >
                     {CONTENT_TYPES.map((type) => (
-                        <ToggleButton 
-                            key={type} 
+                        <ToggleButton
+                            key={type}
                             value={type}
                         >
                             {type}

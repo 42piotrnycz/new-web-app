@@ -14,10 +14,12 @@ import UserSearch from './components/Users/UserSearch';
 import { authService } from './services/auth';
 import './App.css';
 
-function App() {  const [user, setUser] = useState(null);
+function App() {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-  useEffect(() => {    const checkAuth = async () => {
+  useEffect(() => {
+    const checkAuth = async () => {
       try {
         const userData = await authService.getCurrentUser();
         if (userData) {
@@ -61,9 +63,9 @@ function App() {  const [user, setUser] = useState(null);
             </Typography>            {user ? (
               <>
                 {isAdmin && (
-                  <Button 
-                    color="inherit" 
-                    component={Link} 
+                  <Button
+                    color="inherit"
+                    component={Link}
                     to="/admin"
                     sx={{
                       backgroundColor: 'error.main',
