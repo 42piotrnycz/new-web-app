@@ -44,9 +44,7 @@ const UserSearch = () => {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    }
-
-    const handleSearch = async (term = searchTerm) => {
+    } const handleSearch = async (term = searchTerm) => {
         if (!term.trim()) {
             setUsers([]);
             return;
@@ -56,10 +54,9 @@ const UserSearch = () => {
         setError(null);
 
         try {
-            const token = localStorage.getItem('token');
             const response = await fetch(`/api/users/search?username=${encodeURIComponent(term)}`, {
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 }
             });
@@ -78,7 +75,6 @@ const UserSearch = () => {
         }
     };
 
-    // Effect to trigger search when searchTerm changes
     useEffect(() => {
         debouncedSearch(searchTerm);
         return () => debouncedSearch.cancel;

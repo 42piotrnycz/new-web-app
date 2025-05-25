@@ -6,14 +6,16 @@ const login = async (username, password) => {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
+            credentials: 'include',
             body: JSON.stringify({ username, password })
         });
 
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.error || 'Failed to login');
-        } const data = await response.json();
-        localStorage.setItem('token', data.token);
+        }
+
+        const data = await response.json();
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', data.username);
         localStorage.setItem('role', data.role);
@@ -47,57 +49,57 @@ const register = async (username, password, email) => {
     }
 };
 
-const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
+const logout = async () => {
+    try {
+        await fetch('/api/users/logout', {
+            method: 'POST',
+            credentials: 'include'
+        });
+    } catch (error) {
+        console.error('Logout error:', error);
+    } finally {
+        localStorage.removeItem('userId');
+        localStorage.removeItem('username');
+        localStorage.removeItem('role');
+    }
 };
 
 const getCurrentUser = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    const userId = localStorage.getItem('userId');
+    const username = localStorage.getItem('username');
+    const role = localStorage.getItem('role');
+
+    if (!userId || !username || !role) {
         return null;
     }
 
     try {
         const response = await fetch('/api/users/me', {
+            credentials: 'include', // Include HttpOnly cookie automatically
             headers: {
-                'Authorization': `Bearer ${token}`,
                 'Accept': 'application/json'
             }
         });
 
-        try {
-            const textData = await response.text();
-            if (!textData) {
-                throw new Error('Empty response');
-            }
-
-            const data = JSON.parse(textData);
-
-            if (!response.ok) {
-                localStorage.removeItem('token');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('username');
-                localStorage.removeItem('role');
-                return null;
-            }
-
-            return data;
-        } catch (error) {
-            console.error('Error parsing user data:', error);
-            localStorage.removeItem('token');
+        if (!response.ok) {
             localStorage.removeItem('userId');
             localStorage.removeItem('username');
             localStorage.removeItem('role');
             return null;
         }
+
+        const textData = await response.text();
+        if (!textData) {
+            throw new Error('Empty response');
+        }
+
+        const data = JSON.parse(textData);
+        return data;
     } catch (error) {
         console.error('Get current user error:', error);
-        localStorage.removeItem('token');
         localStorage.removeItem('userId');
         localStorage.removeItem('username');
+        localStorage.removeItem('role');
         return null;
     }
 };

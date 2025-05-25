@@ -26,15 +26,12 @@ const EditReview = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [previewUrl, setPreviewUrl] = useState(null);
-
-    useEffect(() => {
+    const [previewUrl, setPreviewUrl] = useState(null); useEffect(() => {
         const fetchReview = async () => {
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch(`/api/reviews/${reviewId}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -101,15 +98,10 @@ const EditReview = () => {
         });
 
         // Add flag to indicate whether to keep existing cover
-        data.append('keepExistingCover', !formData.coverFile && currentCover ? 'true' : 'false');
-
-        try {
-            const token = localStorage.getItem('token');
+        data.append('keepExistingCover', !formData.coverFile && currentCover ? 'true' : 'false'); try {
             const response = await fetch(`/api/reviews/${reviewId}`, {
                 method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                credentials: 'include',
                 body: data
             });
 

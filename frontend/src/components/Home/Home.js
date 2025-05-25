@@ -28,15 +28,12 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [reviewUsernames, setReviewUsernames] = useState({});
     const [selectedType, setSelectedType] = useState('All');
-    const navigate = useNavigate();
-
-    useEffect(() => {
+    const navigate = useNavigate(); useEffect(() => {
         const fetchLatestReviews = async () => {
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch('/api/reviews/latest', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -53,8 +50,8 @@ const Home = () => {
                 // Fetch usernames for all reviews
                 const usernamePromises = data.map(review =>
                     fetch(`/api/users/${review.userID}`, {
+                        credentials: 'include',
                         headers: {
-                            'Authorization': `Bearer ${token}`,
                             'Accept': 'application/json'
                         }
                     }).then(res => res.json())
@@ -76,7 +73,6 @@ const Home = () => {
         fetchLatestReviews();
     }, []);
 
-    // Filter effect
     useEffect(() => {
         if (!reviews) return;
 

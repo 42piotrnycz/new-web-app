@@ -7,15 +7,12 @@ const Profile = () => {
     const [userData, setUserData] = useState(null);
     const [error, setError] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [success, setSuccess] = useState(null);
-
-    useEffect(() => {
+    const [success, setSuccess] = useState(null); useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch('http://localhost:8080/api/users/me', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -32,15 +29,12 @@ const Profile = () => {
         };
 
         fetchUserData();
-    }, []);
-
-    const handleDeleteProfile = async () => {
+    }, []); const handleDeleteProfile = async () => {
         try {
-            const token = localStorage.getItem('token');
             const response = await fetch(`/api/users/${userData.id}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 }
             });

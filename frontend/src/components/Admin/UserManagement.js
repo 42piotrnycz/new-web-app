@@ -30,14 +30,9 @@ const UserManagement = () => {
     const [deleteSuccess, setDeleteSuccess] = useState(null);
     const [selectedRole, setSelectedRole] = useState(''); const fetchUsers = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
-
             const response = await fetch('/api/users/all', {
+                credentials: 'include', // Include HttpOnly cookie
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 }
             });
@@ -83,19 +78,12 @@ const UserManagement = () => {
     const handleDeleteClick = (user) => {
         setSelectedUser(user);
         setDeleteDialogOpen(true);
-    };
-
-    const handleDeleteConfirm = async () => {
+    }; const handleDeleteConfirm = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
-
             const response = await fetch(`/api/users/${selectedUser.id}`, {
                 method: 'DELETE',
+                credentials: 'include', // Include HttpOnly cookie
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 }
             }); const result = await response.json();
@@ -103,12 +91,10 @@ const UserManagement = () => {
                 throw new Error(result.error || 'Failed to delete user');
             }
 
-            // Remove the user from the list and show success message with review count
             setUsers(users.filter(user => user.id !== selectedUser.id));
             setError(null);
             setDeleteDialogOpen(false);
 
-            // Show success alert with auto-hide after 5 seconds
             setDeleteSuccess({
                 message: result.message,
                 reviewsDeleted: result.reviewsDeleted
@@ -123,15 +109,10 @@ const UserManagement = () => {
         }
     }; const handleUpdateRole = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                throw new Error('No authentication token found');
-            }
-
             const response = await fetch(`/api/users/${selectedUser.id}/role`, {
                 method: 'PUT',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
@@ -145,12 +126,11 @@ const UserManagement = () => {
 
             const updatedUser = await response.json();
 
-            // Update the users list with the returned updated user data
             const updatedUsers = users.map(user =>
                 user.id === selectedUser.id ? { ...user, role: updatedUser.role } : user
             );
             setUsers(updatedUsers);
-            setError(null); // Clear any previous errors
+            setError(null); 
             setDialogOpen(false);
         } catch (err) {
             console.error('Error updating user role:', err);

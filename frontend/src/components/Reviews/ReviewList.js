@@ -29,16 +29,13 @@ const ReviewList = ({ userId: propsUserId }) => {
     const [loading, setLoading] = useState(true);
     const [username, setUsername] = useState('');
     const [selectedType, setSelectedType] = useState('All');
-    const navigate = useNavigate();
-
-    useEffect(() => {
+    const navigate = useNavigate(); useEffect(() => {
         const fetchUser = async () => {
             if (!userId) return;
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch(`/api/users/${userId}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -49,15 +46,12 @@ const ReviewList = ({ userId: propsUserId }) => {
             } catch (err) {
                 console.error('Error fetching user:', err);
             }
-        };
-
-        const fetchReviews = async () => {
+        }; const fetchReviews = async () => {
             if (!userId) return;
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch(`/api/reviews/user/${userId}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });

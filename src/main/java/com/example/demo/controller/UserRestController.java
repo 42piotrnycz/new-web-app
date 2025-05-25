@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.File;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -77,7 +79,6 @@ public class UserRestController {
                     new UsernamePasswordAuthenticationToken(
                             credentials.get("username"),
                             credentials.get("password")));
-
             String token = jwtUtil.generateToken(credentials.get("username"),
                     authentication.getAuthorities().iterator().next().getAuthority());
 
@@ -88,14 +89,23 @@ public class UserRestController {
                     .map(user -> user.getRole().name())
                     .orElse("ROLE_USER");
 
-            // Create response map with role
+            // Create HttpOnly cookie for JWT token
+            ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(24 * 60 * 60) // 24 hours
+                    .sameSite("Strict")
+                    .build();
+
             Map<String, Object> responseMap = new HashMap<>();
-            responseMap.put("token", token);
             responseMap.put("userId", userId);
             responseMap.put("username", credentials.get("username"));
             responseMap.put("role", role);
 
-            return ResponseEntity.ok(responseMap);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(responseMap);
         } catch (BadCredentialsException e) {
             log.error("Invalid credentials for user: {}", credentials.get("username"));
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid username or password"));
@@ -364,5 +374,30 @@ public class UserRestController {
                     }
                 })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @Operation(summary = "User Logout", description = "Logout user by clearing the JWT cookie.", tags = {
+            "Authentication" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Logout successful", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    {
+                        "message": "Logout successful"
+                    }
+                    """)))
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        // Clear the JWT cookie
+        ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0) // Expire immediately
+                .sameSite("Strict")
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .body(Map.of("message", "Logout successful"));
     }
 }

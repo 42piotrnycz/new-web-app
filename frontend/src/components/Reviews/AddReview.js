@@ -60,15 +60,10 @@ const AddReview = () => {
             if (formData[key] != null) {
                 data.append(key, formData[key]);
             }
-        });
-
-        try {
-            const token = localStorage.getItem('token');
+        }); try {
             const response = await fetch('/api/reviews', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+                credentials: 'include',
                 body: data
             });
 

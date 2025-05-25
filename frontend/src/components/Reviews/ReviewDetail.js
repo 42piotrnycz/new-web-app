@@ -27,10 +27,9 @@ const ReviewDetail = () => {
     const [success, setSuccess] = useState(null); useEffect(() => {
         const fetchCurrentUser = async () => {
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch('/api/users/me', {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -45,10 +44,9 @@ const ReviewDetail = () => {
 
         const fetchReviewDetails = async () => {
             try {
-                const token = localStorage.getItem('token');
                 const response = await fetch(`/api/reviews/${reviewId}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -62,8 +60,8 @@ const ReviewDetail = () => {
 
                 // Fetch user details
                 const userResponse = await fetch(`/api/users/${reviewData.userID}`, {
+                    credentials: 'include',
                     headers: {
-                        'Authorization': `Bearer ${token}`,
                         'Accept': 'application/json'
                     }
                 });
@@ -83,15 +81,12 @@ const ReviewDetail = () => {
 
         fetchCurrentUser();
         fetchReviewDetails();
-    }, [reviewId]);
-
-    const handleDelete = async () => {
+    }, [reviewId]); const handleDelete = async () => {
         try {
-            const token = localStorage.getItem('token');
             const response = await fetch(`/api/reviews/${reviewId}`, {
                 method: 'DELETE',
+                credentials: 'include',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Accept': 'application/json'
                 }
             });
