@@ -1,17 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-    Typography,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Alert,
-    CircularProgress,
-    Box,
-    Chip
+    Typography, Paper, Table, TableBody, TableCell, TableContainer,
+    TableHead, TableRow, Alert, CircularProgress, Box, Chip
 } from '@mui/material';
 
 const ReviewLogs = () => {
@@ -19,24 +9,17 @@ const ReviewLogs = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
-    useEffect(() => {
-        fetchReviewLogs();
-    }, []);
-
-    const fetchReviewLogs = async () => {
+    const fetchReviewLogs = useCallback(async () => {
         try {
             setLoading(true);
+            setError('');
             const response = await fetch('/api/logs/reviews', {
-                method: 'GET',
                 credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
             });
 
             if (response.ok) {
-                const data = await response.json();
-                setLogs(data);
+                setLogs(await response.json());
             } else {
                 setError('Failed to fetch review logs');
             }
@@ -45,11 +28,13 @@ const ReviewLogs = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleString();
-    };
+    useEffect(() => {
+        fetchReviewLogs();
+    }, [fetchReviewLogs]);
+
+    const formatDate = (dateString) => new Date(dateString).toLocaleString();
 
     const getOperationColor = (operation) => {
         switch (operation.toLowerCase()) {

@@ -1,23 +1,20 @@
 package com.example.demo.service;
 
-import com.example.demo.model.UserLog;
-import com.example.demo.model.ReviewLog;
 import com.example.demo.model.AdminLog;
-import com.example.demo.repository.UserLogRepository;
-import com.example.demo.repository.ReviewLogRepository;
+import com.example.demo.model.ReviewLog;
+import com.example.demo.model.UserLog;
 import com.example.demo.repository.AdminLogRepository;
+import com.example.demo.repository.ReviewLogRepository;
+import com.example.demo.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 import java.time.ZonedDateTime;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class LogService {
-
-    private final UserLogRepository userLogRepository;
+public class LogService {    private final UserLogRepository userLogRepository;
     private final ReviewLogRepository reviewLogRepository;
     private final AdminLogRepository adminLogRepository;
 
@@ -26,15 +23,10 @@ public class LogService {
      */
     public void logUserActivity(Integer userID, String operation) {
         try {
-            UserLog userLog = new UserLog();
-            userLog.setUserID(userID);
-            userLog.setOperation(operation);
-            userLog.setDate(ZonedDateTime.now());
-
+            UserLog userLog = new UserLog(null, userID, operation, ZonedDateTime.now());
             userLogRepository.save(userLog);
             log.debug("Logged user activity: User {} performed {}", userID, operation);
-        } catch (Exception e) {
-            log.error("Failed to log user activity: User {} operation {}", userID, operation, e);
+        } catch (Exception e) {            log.error("Failed to log user activity: User {} operation {}", userID, operation, e);
         }
     }
 
@@ -44,17 +36,10 @@ public class LogService {
     public void logReviewActivity(Integer reviewID, String operation) {
         try {
             Integer nextLogId = getNextReviewLogId();
-
-            ReviewLog reviewLog = new ReviewLog();
-            reviewLog.setLogID(nextLogId);
-            reviewLog.setReviewID(reviewID);
-            reviewLog.setOperation(operation);
-            reviewLog.setDate(ZonedDateTime.now());
-
+            ReviewLog reviewLog = new ReviewLog(nextLogId, reviewID, operation, ZonedDateTime.now());
             reviewLogRepository.save(reviewLog);
             log.debug("Logged review activity: Review {} performed {}", reviewID, operation);
-        } catch (Exception e) {
-            log.error("Failed to log review activity: Review {} operation {}", reviewID, operation, e);
+        } catch (Exception e) {            log.error("Failed to log review activity: Review {} operation {}", reviewID, operation, e);
         }
     }
 
@@ -63,11 +48,7 @@ public class LogService {
      */
     public void logAdminActivity(Integer adminUserID, String operation) {
         try {
-            AdminLog adminLog = new AdminLog();
-            adminLog.setUserID(adminUserID);
-            adminLog.setOperation(operation);
-            adminLog.setDate(ZonedDateTime.now());
-
+            AdminLog adminLog = new AdminLog(null, adminUserID, operation, ZonedDateTime.now());
             adminLogRepository.save(adminLog);
             log.debug("Logged admin activity: Admin {} performed {}", adminUserID, operation);
         } catch (Exception e) {

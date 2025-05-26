@@ -1,24 +1,22 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.UserLog;
-import com.example.demo.model.ReviewLog;
 import com.example.demo.model.AdminLog;
-import com.example.demo.repository.UserLogRepository;
-import com.example.demo.repository.ReviewLogRepository;
+import com.example.demo.model.ReviewLog;
+import com.example.demo.model.UserLog;
 import com.example.demo.repository.AdminLogRepository;
+import com.example.demo.repository.ReviewLogRepository;
+import com.example.demo.repository.UserLogRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @Slf4j
 @RestController

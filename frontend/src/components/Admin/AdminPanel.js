@@ -1,13 +1,6 @@
 import React from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import {
-    Container,
-    Typography,
-    Tabs,
-    Tab,
-    Box,
-    Paper
-} from '@mui/material';
+import { Container, Typography, Tabs, Tab, Box, Paper } from '@mui/material';
 import UserManagement from './UserManagement';
 import UserLogs from './UserLogs';
 import ReviewLogs from './ReviewLogs';
@@ -15,7 +8,9 @@ import AdminLogs from './AdminLogs';
 
 const AdminPanel = () => {
     const navigate = useNavigate();
-    const location = useLocation(); const currentTab = () => {
+    const location = useLocation();
+    
+    const currentTab = () => {
         if (location.pathname === '/admin/user-logs') return 1;
         if (location.pathname === '/admin/review-logs') return 2;
         if (location.pathname === '/admin/admin-logs') return 3;
@@ -44,7 +39,8 @@ const AdminPanel = () => {
                 Admin Panel
             </Typography>
 
-            <Paper sx={{ mt: 3 }}>                <Tabs
+            <Paper sx={{ mt: 3 }}>
+                <Tabs
                 value={currentTab()}
                 onChange={handleChange}
                 indicatorColor="primary"
@@ -54,8 +50,8 @@ const AdminPanel = () => {
                 <Tab label="User Management" />
                 <Tab label="User Logs" />
                 <Tab label="Review Logs" />
-                <Tab label="Admin Logs" />
-            </Tabs>                <Box sx={{ p: 3 }}>
+                <Tab label="Admin Logs" />                </Tabs>
+                <Box sx={{ p: 3 }}>
                     <Routes>
                         <Route index element={<UserManagement />} />
                         <Route path="user-logs" element={<UserLogs />} />
