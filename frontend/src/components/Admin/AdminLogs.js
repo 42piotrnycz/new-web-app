@@ -14,19 +14,19 @@ import {
     Chip
 } from '@mui/material';
 
-const ReviewLogs = () => {
+const AdminLogs = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        fetchReviewLogs();
+        fetchAdminLogs();
     }, []);
 
-    const fetchReviewLogs = async () => {
+    const fetchAdminLogs = async () => {
         try {
             setLoading(true);
-            const response = await fetch('/api/logs/reviews', {
+            const response = await fetch('/api/logs/admin', {
                 method: 'GET',
                 credentials: 'include',
                 headers: {
@@ -38,10 +38,10 @@ const ReviewLogs = () => {
                 const data = await response.json();
                 setLogs(data);
             } else {
-                setError('Failed to fetch review logs');
+                setError('Failed to fetch admin logs');
             }
         } catch (err) {
-            setError('Error loading review logs: ' + err.message);
+            setError('Error loading admin logs: ' + err.message);
         } finally {
             setLoading(false);
         }
@@ -58,15 +58,14 @@ const ReviewLogs = () => {
                 return 'success';
             case 'update':
             case 'updated':
-            case 'edit':
-            case 'edited':
                 return 'info';
             case 'delete':
             case 'deleted':
                 return 'error';
-            case 'view':
-            case 'viewed':
+            case 'login':
                 return 'primary';
+            case 'logout':
+                return 'secondary';
             default:
                 return 'default';
         }
@@ -87,21 +86,21 @@ const ReviewLogs = () => {
     return (
         <Paper sx={{ p: 3 }}>
             <Typography variant="h6" component="h2" gutterBottom>
-                Review Activity Logs
+                Admin Activity Logs
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-                Monitor review creation, updates, and deletion activities
+                Monitor administrative actions performed in the system
             </Typography>
 
             {logs.length === 0 ? (
-                <Alert severity="info">No review logs found.</Alert>
+                <Alert severity="info">No admin logs found.</Alert>
             ) : (
                 <TableContainer>
                     <Table>
                         <TableHead>
                             <TableRow>
                                 <TableCell><strong>Log ID</strong></TableCell>
-                                <TableCell><strong>Review ID</strong></TableCell>
+                                <TableCell><strong>Admin User ID</strong></TableCell>
                                 <TableCell><strong>Operation</strong></TableCell>
                                 <TableCell><strong>Date & Time</strong></TableCell>
                             </TableRow>
@@ -110,7 +109,7 @@ const ReviewLogs = () => {
                             {logs.map((log) => (
                                 <TableRow key={log.logID} hover>
                                     <TableCell>{log.logID}</TableCell>
-                                    <TableCell>{log.reviewID}</TableCell>
+                                    <TableCell>{log.userID}</TableCell>
                                     <TableCell>
                                         <Chip
                                             label={log.operation}
@@ -129,4 +128,4 @@ const ReviewLogs = () => {
     );
 };
 
-export default ReviewLogs;
+export default AdminLogs;

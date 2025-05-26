@@ -6,6 +6,7 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.repository.ReviewRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.UserService;
+import com.example.demo.service.LogService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import java.io.File;
@@ -47,6 +48,7 @@ public class UserRestController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
+    private final LogService logService;
 
     @Operation(summary = "User Login", description = "Authenticate user with username and password. Returns JWT token for subsequent API calls.", tags = {
             "Authentication" })
@@ -262,7 +264,8 @@ public class UserRestController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateUserRole(
             @Parameter(description = "User ID", required = true, example = "1") @PathVariable Long id,
-            @Parameter(description = "Role update request", required = true, example = "{\"role\": \"ROLE_ADMIN\"}") @RequestBody Map<String, String> request) {
+            @Parameter(description = "Role update request", required = true, example = "{\"role\": \"ROLE_ADMIN\"}") @RequestBody Map<String, String> request,
+            Principal principal) {
         return userRepository.findById(id)
                 .map(user -> {
                     String newRole = request.get("role");
@@ -270,6 +273,10 @@ public class UserRestController {
                         User.Role role = User.Role.valueOf(newRole);
                         user.setRole(role);
                         userRepository.save(user);
+                        // Log admin activity
+                        Integer adminId = userService.getUserIdByUsername(principal.getName());
+                        logService.logAdminActivity(adminId, "CHANGED ROLE OF USER (ID: " + id + ")");
+
                         return ResponseEntity.ok(Map.of(
                                 "message", "Role updated successfully",
                                 "id", user.getId(),
@@ -339,7 +346,8 @@ public class UserRestController {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(
-            @Parameter(description = "User ID to delete", required = true, example = "1") @PathVariable Long id) {
+            @Parameter(description = "User ID to delete", required = true, example = "1") @PathVariable Long id,
+            Principal principal) {
         return userRepository.findById(id)
                 .map(user -> {
                     // Prevent self-deletion and admin deletion
@@ -365,6 +373,10 @@ public class UserRestController {
 
                         // Finally delete the user
                         userRepository.delete(user);
+                        // Log admin activity
+                        Integer adminId = userService.getUserIdByUsername(principal.getName());
+                        logService.logAdminActivity(adminId, "DELETED USER (ID: " + id + ")");
+
                         return ResponseEntity.ok(Map.of(
                                 "message", "User and all their reviews deleted successfully",
                                 "reviewsDeleted", userReviews.size()));

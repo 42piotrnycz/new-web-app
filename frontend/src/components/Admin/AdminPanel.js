@@ -11,14 +11,14 @@ import {
 import UserManagement from './UserManagement';
 import UserLogs from './UserLogs';
 import ReviewLogs from './ReviewLogs';
+import AdminLogs from './AdminLogs';
 
 const AdminPanel = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-
-    const currentTab = () => {
+    const location = useLocation(); const currentTab = () => {
         if (location.pathname === '/admin/user-logs') return 1;
         if (location.pathname === '/admin/review-logs') return 2;
+        if (location.pathname === '/admin/admin-logs') return 3;
         return 0;
     };
 
@@ -29,6 +29,9 @@ const AdminPanel = () => {
                 break;
             case 2:
                 navigate('/admin/review-logs');
+                break;
+            case 3:
+                navigate('/admin/admin-logs');
                 break;
             default:
                 navigate('/admin');
@@ -51,13 +54,13 @@ const AdminPanel = () => {
                 <Tab label="User Management" />
                 <Tab label="User Logs" />
                 <Tab label="Review Logs" />
-            </Tabs>
-
-                <Box sx={{ p: 3 }}>
+                <Tab label="Admin Logs" />
+            </Tabs>                <Box sx={{ p: 3 }}>
                     <Routes>
                         <Route index element={<UserManagement />} />
                         <Route path="user-logs" element={<UserLogs />} />
                         <Route path="review-logs" element={<ReviewLogs />} />
+                        <Route path="admin-logs" element={<AdminLogs />} />
                     </Routes>
                 </Box>
             </Paper>
