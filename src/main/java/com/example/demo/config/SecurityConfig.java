@@ -52,17 +52,15 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
-    }
-
-    @Bean
+    }    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/users/login", "/api/users/register").permitAll()
-                    .requestMatchers("/uploads/**").permitAll()
+                    .requestMatchers("/api/users/login", "/api/users/register").permitAll()                    .requestMatchers("/uploads/**").permitAll()
                     // Swagger endpoints
-                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**")
-                    .permitAll()                .requestMatchers("/api/reviews/**").authenticated()
+                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/api-docs/**", "/api/docs", "/api/docs/**", "/api/doc", "/swagger")
+                    .permitAll()
+                    .requestMatchers("/api/reviews/**").authenticated()
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                     .anyRequest().authenticated())
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))

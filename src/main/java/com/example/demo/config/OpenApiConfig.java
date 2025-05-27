@@ -8,10 +8,16 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.servers.Server;
+import io.swagger.v3.oas.models.ExternalDocumentation;
+import io.swagger.v3.oas.models.responses.ApiResponse;
+import io.swagger.v3.oas.models.responses.ApiResponses;
+import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 @Configuration
 public class OpenApiConfig {
@@ -29,6 +35,9 @@ public class OpenApiConfig {
                                                 .license(new License()
                                                                 .name("MIT License")
                                                                 .url("https://opensource.org/licenses/MIT")))
+                                .externalDocs(new ExternalDocumentation()
+                                                .description("REviewer 2.0 Documentation")
+                                                .url("https://github.com/ZTPAI/docs"))
                                 .servers(List.of(
                                                 new Server()
                                                                 .url("http://localhost:8080")
@@ -44,5 +53,41 @@ public class OpenApiConfig {
                                                                                 .scheme("bearer")
                                                                                 .bearerFormat("JWT")
                                                                                 .description("JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"")));
+        }
+        
+        @Bean
+        public OpenApiCustomizer globalApiResponseCustomizer() {
+            return openApi -> {
+                openApi.getPaths().values().forEach(pathItem -> {
+                    pathItem.readOperations().forEach(operation -> {
+                        ApiResponses apiResponses = operation.getResponses();
+                        
+                        // Ensure apiResponses is not null and initialized
+                        if (apiResponses == null) {
+                            apiResponses = new ApiResponses();
+                            operation.setResponses(apiResponses);
+                        }
+                        
+                        // Add common response codes if they don't exist
+                        if (!apiResponses.containsKey("401")) {
+                            apiResponses.addApiResponse("401", new ApiResponse().description("Unauthorized: Authentication required or token expired"));
+                        }
+                        if (!apiResponses.containsKey("403")) {
+                            apiResponses.addApiResponse("403", new ApiResponse().description("Forbidden: Insufficient permissions"));
+                        }
+                        if (!apiResponses.containsKey("404") && !operation.getOperationId().contains("create")) {
+                            apiResponses.addApiResponse("404", new ApiResponse().description("Not Found: Resource not found"));
+                        }
+                        if (!apiResponses.containsKey("500")) {
+                            apiResponses.addApiResponse("500", new ApiResponse().description("Internal Server Error: Something went wrong on the server"));
+                        }
+                        
+                        // Sort responses by status code
+                        Map<String, ApiResponse> sortedResponses = new TreeMap<>(apiResponses);
+                        apiResponses.clear();
+                        sortedResponses.forEach(apiResponses::addApiResponse);
+                    });
+                });
+            };
         }
 }

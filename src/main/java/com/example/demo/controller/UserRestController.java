@@ -93,14 +93,12 @@ public class UserRestController {
 
             log.info("Login successful for user: {}", credentials.get("username"));
 
-            // Get the user's role
             String role = user.getRole().name();
 
             // Create and save refresh token to database
             String refreshTokenValue = refreshTokenService.createRefreshToken(user);
             log.info("Created refresh token for user: {}", credentials.get("username"));
 
-            // Create HttpOnly cookie for JWT token
             ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)
                     .secure(false)
@@ -109,7 +107,6 @@ public class UserRestController {
                     .sameSite("Strict")
                     .build();
 
-            // Create HttpOnly cookie for refresh token
             ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshTokenValue)
                     .httpOnly(true)
                     .secure(false)
@@ -389,9 +386,9 @@ public class UserRestController {
 
                         // Then delete the reviews from database
                         reviewRepository.deleteAll(userReviews);
-
-                        // Finally delete the user
+                        // Delete the user
                         userRepository.delete(user);
+
                         // Log admin activity
                         Integer adminId = userService.getUserIdByUsername(principal.getName());
                         logService.logAdminActivity(adminId, "DELETED USER (ID: " + id + ")");
@@ -438,7 +435,7 @@ public class UserRestController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(0) // Expire immediately
+                .maxAge(0)
                 .sameSite("Strict")
                 .build();
 
@@ -447,7 +444,7 @@ public class UserRestController {
                 .httpOnly(true)
                 .secure(false)
                 .path("/")
-                .maxAge(0) // Expire immediately
+                .maxAge(0)
                 .sameSite("Strict")
                 .build();
 
@@ -489,7 +486,6 @@ public class UserRestController {
                 return ResponseEntity.status(401).body(Map.of("error", "Refresh token not found"));
             }
 
-            // Validate refresh token
             var refreshTokenOpt = refreshTokenService.validateRefreshToken(refreshToken);
             if (refreshTokenOpt.isEmpty()) {
                 return ResponseEntity.status(401).body(Map.of("error", "Invalid or expired refresh token"));
@@ -502,7 +498,6 @@ public class UserRestController {
             String newJwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
             log.info("Generated new JWT for user: {}", user.getUsername());
 
-            // Create new HttpOnly cookie for JWT
             ResponseCookie jwtCookie = ResponseCookie.from("jwt", newJwtToken)
                     .httpOnly(true)
                     .secure(false)
@@ -553,7 +548,6 @@ public class UserRestController {
                 return ResponseEntity.badRequest().body(Map.of("error", "No refresh token found"));
             }
 
-            // Revoke the token
             refreshTokenService.revokeRefreshToken(refreshToken);
             log.info("Revoked refresh token");
 
@@ -562,7 +556,7 @@ public class UserRestController {
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(0) // Expire immediately
+                    .maxAge(0)
                     .sameSite("Strict")
                     .build();
 
