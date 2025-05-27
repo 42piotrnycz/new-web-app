@@ -1,3 +1,5 @@
+import { fetchWithSessionCheck, isSessionExpired, handleSessionExpired } from '../utils/sessionUtils';
+
 const login = async (username, password) => {
     try {
         const response = await fetch('/api/users/login', {
@@ -61,6 +63,9 @@ const logout = async () => {
         localStorage.removeItem('userId');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
+        
+        document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
+        document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
     }
 };
 
@@ -74,17 +79,18 @@ const getCurrentUser = async () => {
     }
 
     try {
-        const response = await fetch('/api/users/me', {
-            credentials: 'include', // Include HttpOnly cookie automatically
+        const response = await fetchWithSessionCheck('/api/users/me', {
             headers: {
                 'Accept': 'application/json'
             }
         });
 
         if (!response.ok) {
-            localStorage.removeItem('userId');
-            localStorage.removeItem('username');
-            localStorage.removeItem('role');
+            if (!isSessionExpired(response)) {
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                localStorage.removeItem('role');
+            }
             return null;
         }
 
@@ -110,3 +116,5 @@ export const authService = {
     logout,
     getCurrentUser
 };
+
+export { fetchWithSessionCheck, isSessionExpired, handleSessionExpired } from '../utils/sessionUtils';

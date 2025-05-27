@@ -3,6 +3,7 @@ import {
     Typography, Paper, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Alert, CircularProgress, Box, Chip
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const UserLogs = () => {
     const [logs, setLogs] = useState([]);
@@ -13,8 +14,7 @@ const UserLogs = () => {
         try {
             setLoading(true);
             setError('');
-            const response = await fetch('/api/logs/users', {
-                credentials: 'include',
+            const response = await fetchWithSessionCheck('/api/logs/users', {
                 headers: { 'Content-Type': 'application/json' },
             });
 
@@ -32,7 +32,7 @@ const UserLogs = () => {
 
     useEffect(() => {
         fetchUserLogs();
-    }, [fetchUserLogs]);const formatDate = (dateString) => new Date(dateString).toLocaleString();
+    }, [fetchUserLogs]); const formatDate = (dateString) => new Date(dateString).toLocaleString();
 
     const getOperationColor = (operation) => {
         switch (operation.toLowerCase()) {

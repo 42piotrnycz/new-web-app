@@ -3,6 +3,7 @@ import {
     Typography, Paper, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Alert, CircularProgress, Box, Chip
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const AdminLogs = () => {
     const [logs, setLogs] = useState([]);
@@ -13,8 +14,7 @@ const AdminLogs = () => {
         try {
             setLoading(true);
             setError('');
-            const response = await fetch('/api/logs/admin', {
-                credentials: 'include',
+            const response = await fetchWithSessionCheck('/api/logs/admin', {
                 headers: { 'Content-Type': 'application/json' },
             });
 

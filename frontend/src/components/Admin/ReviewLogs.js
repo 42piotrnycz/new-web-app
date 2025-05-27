@@ -3,18 +3,17 @@ import {
     Typography, Paper, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Alert, CircularProgress, Box, Chip
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const ReviewLogs = () => {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-
     const fetchReviewLogs = useCallback(async () => {
         try {
             setLoading(true);
             setError('');
-            const response = await fetch('/api/logs/reviews', {
-                credentials: 'include',
+            const response = await fetchWithSessionCheck('/api/logs/reviews', {
                 headers: { 'Content-Type': 'application/json' },
             });
 

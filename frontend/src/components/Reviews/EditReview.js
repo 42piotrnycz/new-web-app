@@ -11,6 +11,7 @@ import {
     Paper,
     CircularProgress
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const EditReview = () => {
     const { reviewId } = useParams();
@@ -27,10 +28,10 @@ const EditReview = () => {
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(true);
     const [previewUrl, setPreviewUrl] = useState(null); useEffect(() => {
+
         const fetchReview = async () => {
             try {
-                const response = await fetch(`/api/reviews/${reviewId}`, {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck(`/api/reviews/${reviewId}`, {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -98,10 +99,11 @@ const EditReview = () => {
         });
 
         // Add flag to indicate whether to keep existing cover
-        data.append('keepExistingCover', !formData.coverFile && currentCover ? 'true' : 'false'); try {
-            const response = await fetch(`/api/reviews/${reviewId}`, {
+        data.append('keepExistingCover', !formData.coverFile && currentCover ? 'true' : 'false');
+
+        try {
+            const response = await fetchWithSessionCheck(`/api/reviews/${reviewId}`, {
                 method: 'PUT',
-                credentials: 'include',
                 body: data
             });
 
@@ -111,7 +113,7 @@ const EditReview = () => {
             }
 
             setSuccess(true);
-            // Redirect after a short delay
+
             setTimeout(() => {
                 navigate(`/review/${reviewId}`);
             }, 2000);

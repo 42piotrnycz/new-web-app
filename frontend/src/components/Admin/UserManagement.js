@@ -19,6 +19,7 @@ import {
     CircularProgress,
     Alert
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -30,16 +31,13 @@ const UserManagement = () => {
     const [deleteSuccess, setDeleteSuccess] = useState(null);
     const [selectedRole, setSelectedRole] = useState(''); const fetchUsers = async () => {
         try {
-            const response = await fetch('/api/users/all', {
-                credentials: 'include', // Include HttpOnly cookie
+            const response = await fetchWithSessionCheck('/api/users/all', {
                 headers: {
                     'Accept': 'application/json'
                 }
             });
 
-            let errorData;
             let data;
-
             try {
                 const textData = await response.text();
                 data = textData ? JSON.parse(textData) : null;
@@ -80,13 +78,14 @@ const UserManagement = () => {
         setDeleteDialogOpen(true);
     }; const handleDeleteConfirm = async () => {
         try {
-            const response = await fetch(`/api/users/${selectedUser.id}`, {
+            const response = await fetchWithSessionCheck(`/api/users/${selectedUser.id}`, {
                 method: 'DELETE',
-                credentials: 'include', // Include HttpOnly cookie
                 headers: {
                     'Accept': 'application/json'
                 }
-            }); const result = await response.json();
+            });
+
+            const result = await response.json();
             if (!response.ok) {
                 throw new Error(result.error || 'Failed to delete user');
             }
@@ -109,9 +108,8 @@ const UserManagement = () => {
         }
     }; const handleUpdateRole = async () => {
         try {
-            const response = await fetch(`/api/users/${selectedUser.id}/role`, {
+            const response = await fetchWithSessionCheck(`/api/users/${selectedUser.id}/role`, {
                 method: 'PUT',
-                credentials: 'include',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'

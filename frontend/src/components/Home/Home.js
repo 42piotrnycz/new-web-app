@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { fetchWithSessionCheck } from '../../services/auth';
 import {
     Container,
     Typography,
@@ -31,8 +32,7 @@ const Home = () => {
     const navigate = useNavigate(); useEffect(() => {
         const fetchLatestReviews = async () => {
             try {
-                const response = await fetch('/api/reviews/latest', {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck('/api/reviews/latest', {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -49,8 +49,7 @@ const Home = () => {
 
                 // Fetch usernames for all reviews
                 const usernamePromises = data.map(review =>
-                    fetch(`/api/users/${review.userID}`, {
-                        credentials: 'include',
+                    fetchWithSessionCheck(`/api/users/${review.userID}`, {
                         headers: {
                             'Accept': 'application/json'
                         }

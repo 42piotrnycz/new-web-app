@@ -13,6 +13,7 @@ import {
     ToggleButton,
     ToggleButtonGroup
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const CARD_HEIGHT = 500;
 const CARD_WIDTH = 345;
@@ -33,8 +34,7 @@ const ReviewList = ({ userId: propsUserId }) => {
         const fetchUser = async () => {
             if (!userId) return;
             try {
-                const response = await fetch(`/api/users/${userId}`, {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck(`/api/users/${userId}`, {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -49,8 +49,7 @@ const ReviewList = ({ userId: propsUserId }) => {
         }; const fetchReviews = async () => {
             if (!userId) return;
             try {
-                const response = await fetch(`/api/reviews/user/${userId}`, {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck(`/api/reviews/user/${userId}`, {
                     headers: {
                         'Accept': 'application/json'
                     }

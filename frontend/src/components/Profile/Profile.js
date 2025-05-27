@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Container, Typography, Paper, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -10,8 +11,7 @@ const Profile = () => {
     const [success, setSuccess] = useState(null); useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const response = await fetch('http://localhost:8080/api/users/me', {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck('/api/users/me', {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -31,9 +31,8 @@ const Profile = () => {
         fetchUserData();
     }, []); const handleDeleteProfile = async () => {
         try {
-            const response = await fetch(`/api/users/${userData.id}`, {
+            const response = await fetchWithSessionCheck(`/api/users/${userData.id}`, {
                 method: 'DELETE',
-                credentials: 'include',
                 headers: {
                     'Accept': 'application/json'
                 }

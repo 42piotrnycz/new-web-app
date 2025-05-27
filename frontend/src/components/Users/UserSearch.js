@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const UserSearch = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -52,10 +53,9 @@ const UserSearch = () => {
 
         setLoading(true);
         setError(null);
-
+        
         try {
-            const response = await fetch(`/api/users/search?username=${encodeURIComponent(term)}`, {
-                credentials: 'include',
+            const response = await fetchWithSessionCheck(`/api/users/search?username=${encodeURIComponent(term)}`, {
                 headers: {
                     'Accept': 'application/json'
                 }

@@ -14,6 +14,7 @@ import {
     DialogContent,
     DialogActions
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const ReviewDetail = () => {
     const { reviewId } = useParams();
@@ -24,11 +25,10 @@ const ReviewDetail = () => {
     const [loading, setLoading] = useState(true);
     const [currentUser, setCurrentUser] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [success, setSuccess] = useState(null); useEffect(() => {
+    const [success, setSuccess] = useState(null); useEffect(() => {        
         const fetchCurrentUser = async () => {
             try {
-                const response = await fetch('/api/users/me', {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck('/api/users/me', {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -40,12 +40,11 @@ const ReviewDetail = () => {
             } catch (err) {
                 console.error('Error fetching current user:', err);
             }
-        };
-
+        };        
+        
         const fetchReviewDetails = async () => {
             try {
-                const response = await fetch(`/api/reviews/${reviewId}`, {
-                    credentials: 'include',
+                const response = await fetchWithSessionCheck(`/api/reviews/${reviewId}`, {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -59,8 +58,7 @@ const ReviewDetail = () => {
                 setReview(reviewData);
 
                 // Fetch user details
-                const userResponse = await fetch(`/api/users/${reviewData.userID}`, {
-                    credentials: 'include',
+                const userResponse = await fetchWithSessionCheck(`/api/users/${reviewData.userID}`, {
                     headers: {
                         'Accept': 'application/json'
                     }
@@ -83,9 +81,8 @@ const ReviewDetail = () => {
         fetchReviewDetails();
     }, [reviewId]); const handleDelete = async () => {
         try {
-            const response = await fetch(`/api/reviews/${reviewId}`, {
+            const response = await fetchWithSessionCheck(`/api/reviews/${reviewId}`, {
                 method: 'DELETE',
-                credentials: 'include',
                 headers: {
                     'Accept': 'application/json'
                 }

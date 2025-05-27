@@ -6,6 +6,7 @@ import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.LogService;
+import com.example.demo.service.RefreshTokenService;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,6 +29,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.security.Principal;
 import java.util.HashMap;
@@ -48,6 +50,7 @@ public class UserRestController {
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
     private final LogService logService;
+    private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "User Login", description = "Authenticate user with username and password. Returns JWT token for subsequent API calls.", tags = {
             "Authentication" })
@@ -75,7 +78,6 @@ public class UserRestController {
             if (credentials.get("username") == null || credentials.get("password") == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Username and password are required"));
             }
-
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             credentials.get("username"),
@@ -85,10 +87,18 @@ public class UserRestController {
 
             Integer userId = userService.getUserIdByUsername(credentials.get("username"));
 
-            log.info("Login successful for user: {}", credentials.get("username")); // Get the user's role
-            String role = userRepository.findByUsername(credentials.get("username"))
-                    .map(user -> user.getRole().name())
-                    .orElse("ROLE_USER");
+            // Find the user entity for refresh token creation
+            User user = userRepository.findByUsername(credentials.get("username"))
+                    .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+
+            log.info("Login successful for user: {}", credentials.get("username"));
+
+            // Get the user's role
+            String role = user.getRole().name();
+
+            // Create and save refresh token to database
+            String refreshTokenValue = refreshTokenService.createRefreshToken(user);
+            log.info("Created refresh token for user: {}", credentials.get("username"));
 
             // Create HttpOnly cookie for JWT token
             ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
@@ -99,6 +109,15 @@ public class UserRestController {
                     .sameSite("Strict")
                     .build();
 
+            // Create HttpOnly cookie for refresh token
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshTokenValue)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(7 * 24 * 60 * 60) // 7 days
+                    .sameSite("Strict")
+                    .build();
+
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("userId", userId);
             responseMap.put("username", credentials.get("username"));
@@ -106,6 +125,7 @@ public class UserRestController {
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                     .body(responseMap);
         } catch (BadCredentialsException e) {
             log.error("Invalid credentials for user: {}", credentials.get("username"));
@@ -397,7 +417,22 @@ public class UserRestController {
                     """)))
     })
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
+    public ResponseEntity<?> logout(HttpServletRequest request, Principal principal) {
+        try {
+            // Revoke refresh token from database if user is authenticated
+            if (principal != null) {
+                User user = userRepository.findByUsername(principal.getName())
+                        .orElse(null);
+                if (user != null) {
+                    refreshTokenService.revokeAllUserTokens(user);
+                    log.info("Revoked refresh tokens for user: {}", principal.getName());
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Error revoking refresh tokens during logout", e);
+            // Continue with logout even if token revocation fails
+        }
+
         // Clear the JWT cookie
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
@@ -407,8 +442,137 @@ public class UserRestController {
                 .sameSite("Strict")
                 .build();
 
+        // Clear the refresh token cookie
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(0) // Expire immediately
+                .sameSite("Strict")
+                .build();
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(Map.of("message", "Logout successful"));
+    }
+
+    @Operation(summary = "Refresh JWT Token", description = "Use refresh token to get a new JWT token.", tags = {
+            "Authentication" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token refreshed successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    {
+                        "message": "Token refreshed successfully"
+                    }
+                    """))),
+            @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    {
+                        "error": "Invalid or expired refresh token"
+                    }
+                    """)))
+    })
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        try {
+            // Extract refresh token from cookie
+            String refreshToken = null;
+            if (request.getCookies() != null) {
+                for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                    if ("refreshToken".equals(cookie.getName())) {
+                        refreshToken = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (refreshToken == null || refreshToken.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Refresh token not found"));
+            }
+
+            // Validate refresh token
+            var refreshTokenOpt = refreshTokenService.validateRefreshToken(refreshToken);
+            if (refreshTokenOpt.isEmpty()) {
+                return ResponseEntity.status(401).body(Map.of("error", "Invalid or expired refresh token"));
+            }
+
+            var refreshTokenEntity = refreshTokenOpt.get();
+            var user = refreshTokenEntity.getUser();
+
+            // Generate new JWT token
+            String newJwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
+            log.info("Generated new JWT for user: {}", user.getUsername());
+
+            // Create new HttpOnly cookie for JWT
+            ResponseCookie jwtCookie = ResponseCookie.from("jwt", newJwtToken)
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(24 * 60 * 60) // 24 hours
+                    .sameSite("Strict")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .body(Map.of("message", "Token refreshed successfully"));
+
+        } catch (Exception e) {
+            log.error("Error refreshing token", e);
+            return ResponseEntity.status(401).body(Map.of("error", "Failed to refresh token"));
+        }
+    }
+
+    @Operation(summary = "Revoke Refresh Token", description = "Revoke the current refresh token.", tags = {
+            "Authentication" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Refresh token revoked successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    {
+                        "message": "Refresh token revoked successfully"
+                    }
+                    """))),
+            @ApiResponse(responseCode = "400", description = "No refresh token found", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    {
+                        "error": "No refresh token found"
+                    }
+                    """)))
+    })
+    @PostMapping("/revoke-refresh")
+    public ResponseEntity<?> revokeRefreshToken(HttpServletRequest request) {
+        try {
+            // Extract refresh token from cookie
+            String refreshToken = null;
+            if (request.getCookies() != null) {
+                for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
+                    if ("refreshToken".equals(cookie.getName())) {
+                        refreshToken = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (refreshToken == null || refreshToken.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("error", "No refresh token found"));
+            }
+
+            // Revoke the token
+            refreshTokenService.revokeRefreshToken(refreshToken);
+            log.info("Revoked refresh token");
+
+            // Clear the refresh token cookie
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+                    .httpOnly(true)
+                    .secure(false)
+                    .path("/")
+                    .maxAge(0) // Expire immediately
+                    .sameSite("Strict")
+                    .build();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(Map.of("message", "Refresh token revoked successfully"));
+
+        } catch (Exception e) {
+            log.error("Error revoking refresh token", e);
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to revoke refresh token"));
+        }
     }
 }

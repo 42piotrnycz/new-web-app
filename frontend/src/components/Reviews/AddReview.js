@@ -11,6 +11,7 @@ import {
     Paper,
     CircularProgress
 } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const AddReview = () => {
     const navigate = useNavigate();
@@ -61,9 +62,8 @@ const AddReview = () => {
                 data.append(key, formData[key]);
             }
         }); try {
-            const response = await fetch('/api/reviews', {
+            const response = await fetchWithSessionCheck('/api/reviews', {
                 method: 'POST',
-                credentials: 'include',
                 body: data
             });
 
@@ -73,6 +73,7 @@ const AddReview = () => {
             }
 
             setSuccess(true);
+            
             // Clear form
             setFormData({
                 contentType: '',
@@ -83,7 +84,6 @@ const AddReview = () => {
             });
             setPreviewUrl(null);
 
-            // Redirect after a short delay
             setTimeout(() => {
                 navigate('/reviews');
             }, 2000);
