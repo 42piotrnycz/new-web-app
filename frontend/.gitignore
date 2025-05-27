@@ -49,6 +49,10 @@ pids
 # output of 'npm pack'
 *.tgz
 
+# lock files
+package-lock.json
+yarn.lock
+
 # yarn integrity file
 .yarn-integrity
 
