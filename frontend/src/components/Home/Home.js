@@ -45,9 +45,8 @@ const Home = () => {
 
                 const data = await response.json();
                 setReviews(data);
-                setFilteredReviews(data); // Initialize filtered reviews with all reviews
+                setFilteredReviews(data);
 
-                // Fetch usernames for all reviews
                 const usernamePromises = data.map(review =>
                     fetchWithSessionCheck(`/api/users/${review.userID}`, {
                         headers: {

@@ -163,15 +163,29 @@ const ReviewDetail = () => {
                                 Delete Review
                             </Button>
                         </Box>
-                    )}
-                    <Typography
+                    )}                    <Typography
                         variant="body2"
                         color="text.secondary"
                         sx={{ mb: 1, textTransform: 'uppercase' }}
                     >
                         {review.contentType}
                     </Typography>
-                    <Typography variant="h4" component="h1" gutterBottom>
+                    <Typography 
+                        variant="h4" 
+                        component={Link}
+                        to={`/content/${encodeURIComponent(review.contentTitle)}`}
+                        sx={{
+                            color: 'inherit',
+                            textDecoration: 'none',
+                            '&:hover': {
+                                textDecoration: 'underline',
+                                color: 'primary.main'
+                            },
+                            cursor: 'pointer',
+                            display: 'block'
+                        }}
+                        gutterBottom
+                    >
                         {review.contentTitle}
                     </Typography>
                 </CardContent>

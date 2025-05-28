@@ -70,26 +70,98 @@ const EditReview = () => {
             [name]: value
         }));
         setError(null);
+    }; const resizeImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.7) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+
+            reader.onload = (readerEvent) => {
+                const img = new Image();
+
+                img.onload = () => {
+                    let width = img.width;
+                    let height = img.height;
+                    let needsResize = false;
+
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                        needsResize = true;
+                    }
+
+                    if (height > maxHeight) {
+                        width = (width * maxHeight) / height;
+                        height = maxHeight;
+                        needsResize = true;
+                    }
+
+                    if (!needsResize) {
+                        resolve(file);
+                        return;
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    canvas.toBlob((blob) => {
+                        const resizedFile = new File([blob], file.name, {
+                            type: file.type,
+                            lastModified: Date.now()
+                        });
+
+                        resolve(resizedFile);
+                    }, file.type, quality);
+                };
+
+                img.src = readerEvent.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        });
     };
 
-    const handleFileChange = (e) => {
+    const handleFileChange = async (e) => {
         const file = e.target.files[0];
         if (file) {
-            setFormData(prev => ({
-                ...prev,
-                coverFile: file
-            }));
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
+            try {
+                const url = URL.createObjectURL(file);
+                setPreviewUrl(url);
+
+                const resizedFile = await resizeImage(file);
+
+                setFormData(prev => ({
+                    ...prev,
+                    coverFile: resizedFile
+                }));
+
+                console.log(`Original file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                console.log(`Resized file size: ${(resizedFile.size / 1024 / 1024).toFixed(2)}MB`);
+
+            } catch (err) {
+                console.error('Error resizing image:', err);
+                setError('Error processing image. Please try a different file.');
+
+                setFormData(prev => ({
+                    ...prev,
+                    coverFile: file
+                }));
+            }
         }
         setError(null);
-    };
-
-    const handleSubmit = async (e) => {
+    }; const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
         setLoading(true);
+
+        if (formData.coverFile && formData.coverFile.size > 5 * 1024 * 1024) { // 5MB limit
+            setError("Image is still too large. Maximum allowed size is 5MB.");
+            setLoading(false);
+            return;
+        }
 
         const data = new FormData();
         Object.keys(formData).forEach(key => {

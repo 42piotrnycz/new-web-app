@@ -30,7 +30,6 @@ public class RefreshTokenService {
      */
     @Transactional
     public String createRefreshToken(User user) {
-        // Revoke any existing tokens for this user
         revokeAllUserTokens(user);
 
         // Create new refresh token

@@ -5,6 +5,7 @@ import Home from './components/Home/Home';
 import AdminPanel from './components/Admin/AdminPanel';
 import ReviewList from './components/Reviews/ReviewList';
 import ReviewDetail from './components/Reviews/ReviewDetail';
+import ContentReviewList from './components/Reviews/ContentReviewList';
 import AddReview from './components/Reviews/AddReview';
 import EditReview from './components/Reviews/EditReview';
 import Login from './components/Auth/Login';
@@ -140,10 +141,13 @@ function App() {
                   <Navigate to="/" replace />
                 )
               }
-            />
-            <Route
+            />            <Route
               path="/user/:userId/reviews"
               element={user ? <ReviewList /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/content/:contentTitle"
+              element={user ? <ContentReviewList /> : <Navigate to="/login" />}
             />
             <Route
               path="/add-review"

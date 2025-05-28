@@ -95,7 +95,6 @@ public class UserRestController {
 
             String role = user.getRole().name();
 
-            // Create and save refresh token to database
             String refreshTokenValue = refreshTokenService.createRefreshToken(user);
             log.info("Created refresh token for user: {}", credentials.get("username"));
 
@@ -289,7 +288,7 @@ public class UserRestController {
                         User.Role role = User.Role.valueOf(newRole);
                         user.setRole(role);
                         userRepository.save(user);
-                        // Log admin activity
+
                         Integer adminId = userService.getUserIdByUsername(principal.getName());
                         logService.logAdminActivity(adminId, "CHANGED ROLE OF USER (ID: " + id + ")");
 
@@ -386,10 +385,8 @@ public class UserRestController {
 
                         // Then delete the reviews from database
                         reviewRepository.deleteAll(userReviews);
-                        // Delete the user
                         userRepository.delete(user);
 
-                        // Log admin activity
                         Integer adminId = userService.getUserIdByUsername(principal.getName());
                         logService.logAdminActivity(adminId, "DELETED USER (ID: " + id + ")");
 

@@ -10,4 +10,6 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
     List<Review> findByUserID(Integer userID);
 
     List<Review> findTop25ByOrderByReviewIDDesc();
+    
+    List<Review> findByContentTitleOrderByReviewIDDesc(String contentTitle);
 }

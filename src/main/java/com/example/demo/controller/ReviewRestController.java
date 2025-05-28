@@ -118,6 +118,46 @@ public class ReviewRestController {
         return ResponseEntity.ok(reviews);
     }
 
+    @Operation(summary = "Get Reviews by Content Title", description = "Retrieve all reviews for a specific content title.", tags = {
+            "Review Retrieval" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    [
+                        {
+                            "reviewID": 1,
+                            "userID": 1,
+                            "contentType": "Movie",
+                            "contentTitle": "The Matrix",
+                            "reviewTitle": "Great Sci-Fi Movie",
+                            "reviewDescription": "Amazing special effects and storyline...",
+                            "coverFile": "cover1.jpg"
+                        },
+                        {
+                            "reviewID": 5,
+                            "userID": 2,
+                            "contentType": "Movie",
+                            "contentTitle": "The Matrix",
+                            "reviewTitle": "Classic Action Movie",
+                            "reviewDescription": "One of the best sci-fi films ever made...",
+                            "coverFile": "cover5.jpg"
+                        }
+                    ]
+                    """))),
+            @ApiResponse(responseCode = "404", description = "No reviews found for the specified content title", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
+                    {
+                        "error": "No reviews found for content title 'The Matrix'"
+                    }
+                    """)))
+    })
+    @GetMapping("/content")
+    public ResponseEntity<?> getReviewsByContentTitle(
+            @Parameter(description = "Content title to get reviews for", required = true, example = "The Matrix") @RequestParam String title) {
+        List<Review> reviews = reviewRepository.findByContentTitleOrderByReviewIDDesc(title);
+        return reviews.isEmpty()
+                ? ResponseEntity.status(404).body(Map.of("error", "No reviews found for content title '" + title + "'"))
+                : ResponseEntity.ok(reviews);
+    }
+
     @Operation(summary = "Create New Review", description = "Create a new review with optional cover image upload. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
             "Review Management" })
     @ApiResponses(value = {

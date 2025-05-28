@@ -27,10 +27,8 @@ public class AdminController {
         long userCount = users.size();
         long reviewCount = reviewRepository.count();
         
-        // For this example, we'll consider all users as active
         long activeUsers = userCount;
 
-        // Add counts for each user's reviews
         var usersWithReviewCounts = users.stream()
             .map(user -> {
                 var reviewsCount = reviewRepository.findByUserID(user.getId()).size();

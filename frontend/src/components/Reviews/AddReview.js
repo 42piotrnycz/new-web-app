@@ -36,25 +36,114 @@ const AddReview = () => {
         setError(null);
     };
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData(prev => ({
-                ...prev,
-                cover: file
-            }));
-            // Create preview URL
-            const url = URL.createObjectURL(file);
-            setPreviewUrl(url);
-        }
-        setError(null);
+    const resizeImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.7) => {
+        return new Promise((resolve) => {
+            // Create a FileReader to read the file
+            const reader = new FileReader();
+            
+            // Set up the FileReader onload event
+            reader.onload = (readerEvent) => {
+                // Create an image element
+                const img = new Image();
+                
+                img.onload = () => {
+                    // Calculate new dimensions while maintaining aspect ratio
+                    let width = img.width;
+                    let height = img.height;
+                    let needsResize = false;
+                    
+                    if (width > maxWidth) {
+                        height = (height * maxWidth) / width;
+                        width = maxWidth;
+                        needsResize = true;
+                    }
+                    
+                    if (height > maxHeight) {
+                        width = (width * maxHeight) / height;
+                        height = maxHeight;
+                        needsResize = true;
+                    }
+                    
+                    // If the image is smaller than our max dimensions, don't resize
+                    if (!needsResize) {
+                        resolve(file);
+                        return;
+                    }
+                    
+                    // Create a canvas element
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw the image on the canvas
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Convert canvas to blob
+                    canvas.toBlob((blob) => {
+                        // Create a new File object from the blob
+                        const resizedFile = new File([blob], file.name, {
+                            type: file.type,
+                            lastModified: Date.now()
+                        });
+                        
+                        resolve(resizedFile);
+                    }, file.type, quality);
+                };
+                
+                // Set the image source to the FileReader result
+                img.src = readerEvent.target.result;
+            };
+            
+            // Read the file as a data URL
+            reader.readAsDataURL(file);
+        });
     };
 
-    const handleSubmit = async (e) => {
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            try {
+                // Create preview URL first
+                const url = URL.createObjectURL(file);
+                setPreviewUrl(url);
+                
+                // Resize the image if it's too large
+                const resizedFile = await resizeImage(file);
+                
+                setFormData(prev => ({
+                    ...prev,
+                    cover: resizedFile
+                }));
+                
+                // Log the file sizes for reference
+                console.log(`Original file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+                console.log(`Resized file size: ${(resizedFile.size / 1024 / 1024).toFixed(2)}MB`);
+                
+            } catch (err) {
+                console.error('Error resizing image:', err);
+                setError('Error processing image. Please try a different file.');
+                
+                // If error occurs, still set the original file
+                setFormData(prev => ({
+                    ...prev,
+                    cover: file
+                }));
+            }
+        }
+        setError(null);
+    };    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
         setLoading(true);
+
+        // Check if image size is still too large
+        if (formData.cover && formData.cover.size > 5 * 1024 * 1024) { // 5MB limit
+            setError("Image is still too large. Maximum allowed size is 5MB.");
+            setLoading(false);
+            return;
+        }
 
         const data = new FormData();
         Object.keys(formData).forEach(key => {
@@ -73,7 +162,7 @@ const AddReview = () => {
             }
 
             setSuccess(true);
-            
+
             // Clear form
             setFormData({
                 contentType: '',
