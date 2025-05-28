@@ -1,6 +1,6 @@
 import React from 'react';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { Container, Typography, Tabs, Tab, Box, Paper } from '@mui/material';
+import {Route, Routes, useLocation, useNavigate} from 'react-router-dom';
+import {Box, Container, Paper, Tab, Tabs, Typography} from '@mui/material';
 import UserManagement from './UserManagement';
 import UserLogs from './UserLogs';
 import ReviewLogs from './ReviewLogs';
@@ -9,7 +9,7 @@ import AdminLogs from './AdminLogs';
 const AdminPanel = () => {
     const navigate = useNavigate();
     const location = useLocation();
-    
+
     const currentTab = () => {
         if (location.pathname === '/admin/user-logs') return 1;
         if (location.pathname === '/admin/review-logs') return 2;
@@ -34,29 +34,29 @@ const AdminPanel = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
+        <Container maxWidth="lg" sx={{mt: 4}}>
             <Typography variant="h4" component="h1" gutterBottom align="center">
                 Admin Panel
             </Typography>
 
-            <Paper sx={{ mt: 3 }}>
+            <Paper sx={{mt: 3}}>
                 <Tabs
-                value={currentTab()}
-                onChange={handleChange}
-                indicatorColor="primary"
-                textColor="primary"
-                centered
-            >
-                <Tab label="User Management" />
-                <Tab label="User Logs" />
-                <Tab label="Review Logs" />
-                <Tab label="Admin Logs" />                </Tabs>
-                <Box sx={{ p: 3 }}>
+                    value={currentTab()}
+                    onChange={handleChange}
+                    indicatorColor="primary"
+                    textColor="primary"
+                    centered
+                >
+                    <Tab label="User Management"/>
+                    <Tab label="User Logs"/>
+                    <Tab label="Review Logs"/>
+                    <Tab label="Admin Logs"/> </Tabs>
+                <Box sx={{p: 3}}>
                     <Routes>
-                        <Route index element={<UserManagement />} />
-                        <Route path="user-logs" element={<UserLogs />} />
-                        <Route path="review-logs" element={<ReviewLogs />} />
-                        <Route path="admin-logs" element={<AdminLogs />} />
+                        <Route index element={<UserManagement/>}/>
+                        <Route path="user-logs" element={<UserLogs/>}/>
+                        <Route path="review-logs" element={<ReviewLogs/>}/>
+                        <Route path="admin-logs" element={<AdminLogs/>}/>
                     </Routes>
                 </Box>
             </Paper>

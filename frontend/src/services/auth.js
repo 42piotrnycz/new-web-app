@@ -1,4 +1,4 @@
-import { fetchWithSessionCheck, isSessionExpired, handleSessionExpired } from '../utils/sessionUtils';
+import {fetchWithSessionCheck, handleSessionExpired, isSessionExpired} from '../utils/sessionUtils';
 
 const login = async (username, password) => {
     try {
@@ -9,7 +9,7 @@ const login = async (username, password) => {
                 'Accept': 'application/json'
             },
             credentials: 'include',
-            body: JSON.stringify({ username, password })
+            body: JSON.stringify({username, password})
         });
 
         if (!response.ok) {
@@ -36,7 +36,7 @@ const register = async (username, password, email) => {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             },
-            body: JSON.stringify({ username, password, email })
+            body: JSON.stringify({username, password, email})
         });
 
         if (!response.ok) {
@@ -63,7 +63,7 @@ const logout = async () => {
         localStorage.removeItem('userId');
         localStorage.removeItem('username');
         localStorage.removeItem('role');
-        
+
         document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
         document.cookie = 'refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; SameSite=Strict';
     }
@@ -117,4 +117,4 @@ export const authService = {
     getCurrentUser
 };
 
-export { fetchWithSessionCheck, isSessionExpired, handleSessionExpired } from '../utils/sessionUtils';
+export {fetchWithSessionCheck, isSessionExpired, handleSessionExpired} from '../utils/sessionUtils';

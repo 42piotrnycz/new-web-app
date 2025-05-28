@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Typography, Container, Box, Alert } from '@mui/material';
-import { authService } from '../../services/auth';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Alert, Box, Button, Container, TextField, Typography} from '@mui/material';
+import {authService} from '../../services/auth';
 
 const Login = () => {
     const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ const Login = () => {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -44,16 +44,16 @@ const Login = () => {
 
     return (
         <Container maxWidth="sm">
-            <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <Typography component="h1" variant="h5">
                     Login
                 </Typography>
                 {error && (
-                    <Alert severity="error" sx={{ mt: 2, width: '100%' }}>
+                    <Alert severity="error" sx={{mt: 2, width: '100%'}}>
                         {error}
                     </Alert>
                 )}
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
+                <Box component="form" onSubmit={handleSubmit} sx={{mt: 1, width: '100%'}}>
                     <TextField
                         margin="normal"
                         required
@@ -84,7 +84,7 @@ const Login = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        sx={{mt: 3, mb: 2}}
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? 'Signing in...' : 'Sign In'}

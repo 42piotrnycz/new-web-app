@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Typography, Container, Box } from '@mui/material';
-import { authService } from '../../services/auth';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {Box, Button, Container, TextField, Typography} from '@mui/material';
+import {authService} from '../../services/auth';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ const Register = () => {
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -32,16 +32,16 @@ const Register = () => {
 
     return (
         <Container maxWidth="sm">
-            <Box sx={{ mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Box sx={{mt: 8, display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                 <Typography component="h1" variant="h5">
                     Register
                 </Typography>
                 {error && (
-                    <Typography color="error" sx={{ mt: 2 }}>
+                    <Typography color="error" sx={{mt: 2}}>
                         {error}
                     </Typography>
                 )}
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+                <Box component="form" onSubmit={handleSubmit} sx={{mt: 1}}>
                     <TextField
                         margin="normal"
                         required
@@ -82,7 +82,7 @@ const Register = () => {
                         type="submit"
                         fullWidth
                         variant="contained"
-                        sx={{ mt: 3, mb: 2 }}
+                        sx={{mt: 3, mb: 2}}
                     >
                         Sign Up
                     </Button>

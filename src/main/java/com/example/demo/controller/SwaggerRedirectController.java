@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
  */
 @Controller
 public class SwaggerRedirectController {
-    
+
     /**
      * Redirects /api/doc to the configured Swagger UI path
      */
@@ -16,7 +16,7 @@ public class SwaggerRedirectController {
     public String redirectToApiDoc() {
         return "redirect:/api/docs";
     }
-    
+
     /**
      * Redirects root path to Swagger UI for convenience
      */

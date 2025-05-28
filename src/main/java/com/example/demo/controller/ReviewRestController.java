@@ -3,24 +3,24 @@ package com.example.demo.controller;
 import com.example.demo.model.Review;
 import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
-import java.security.Principal;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.security.Principal;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -32,7 +32,7 @@ public class ReviewRestController {
     private final UserRepository userRepository;
 
     @Operation(summary = "Get Reviews by User ID", description = "Retrieve all reviews created by a specific user.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -63,7 +63,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Get Review by ID", description = "Retrieve a specific review by its unique identifier.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review found successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -87,7 +87,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Get Latest Reviews", description = "Retrieve the 25 most recently created reviews.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Latest reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -119,7 +119,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Get Reviews by Content Title", description = "Retrieve all reviews for a specific content title.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -159,7 +159,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Create New Review", description = "Create a new review with optional cover image upload. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Review Management" })
+            "Review Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review created successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -205,7 +205,7 @@ public class ReviewRestController {
                     extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
                 }
 
-                fileName = UUID.randomUUID().toString() + extension;
+                fileName = UUID.randomUUID() + extension;
                 cover.transferTo(new File(uploadDir, fileName));
             }
 
@@ -225,7 +225,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Update Review", description = "Update an existing review. Only the review owner can update their reviews. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Review Management" })
+            "Review Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review updated successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -295,7 +295,7 @@ public class ReviewRestController {
                     extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
                 }
 
-                fileName = UUID.randomUUID().toString() + extension;
+                fileName = UUID.randomUUID() + extension;
                 coverFile.transferTo(new File(uploadDir, fileName));
             }
 
@@ -316,7 +316,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Delete Review", description = "Delete a review. Only the review owner can delete their reviews. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Review Management" })
+            "Review Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review deleted successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {

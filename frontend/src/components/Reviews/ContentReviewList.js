@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import {
-    Container,
-    Typography,
-    Card,
-    CardContent,
-    CardMedia,
-    Grid,
-    CircularProgress,
-    Alert,
-    Box
-} from '@mui/material';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Alert, Box, Card, CardContent, CardMedia, CircularProgress, Container, Grid, Typography} from '@mui/material';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 
 const CARD_HEIGHT = 500;
 const CARD_WIDTH = 345;
 const IMAGE_HEIGHT = 200;
 
 const ContentReviewList = () => {
-    const { contentTitle } = useParams();
+    const {contentTitle} = useParams();
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -59,15 +49,15 @@ const ContentReviewList = () => {
 
     if (loading) {
         return (
-            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
+            <Container sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
+                <CircularProgress/>
             </Container>
         );
     }
 
     if (error) {
         return (
-            <Container sx={{ mt: 4 }}>
+            <Container sx={{mt: 4}}>
                 <Alert severity="error">{error}</Alert>
             </Container>
         );
@@ -75,21 +65,21 @@ const ContentReviewList = () => {
 
     if (reviews.length === 0) {
         return (
-            <Container sx={{ mt: 4 }}>
+            <Container sx={{mt: 4}}>
                 <Alert severity="info">No reviews found for "{contentTitle}"</Alert>
             </Container>
         );
     }
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+        <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
             <Typography variant="h4" component="h1" gutterBottom>
                 Reviews for "{contentTitle}"
             </Typography>
 
-            <Grid container spacing={3} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Grid container spacing={3} sx={{display: 'flex', justifyContent: 'flex-start'}}>
                 {reviews.map(review => (
-                    <Grid item key={review.reviewID} sx={{ width: CARD_WIDTH, m: 1 }}>
+                    <Grid item key={review.reviewID} sx={{width: CARD_WIDTH, m: 1}}>
                         <Card
                             sx={{
                                 width: CARD_WIDTH,
@@ -105,7 +95,7 @@ const ContentReviewList = () => {
                             }}
                             onClick={() => handleReviewClick(review.reviewID)}
                         >
-                            <CardContent sx={{ p: 2, pb: 0, flex: '0 0 auto' }}>
+                            <CardContent sx={{p: 2, pb: 0, flex: '0 0 auto'}}>
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
@@ -135,7 +125,7 @@ const ContentReviewList = () => {
                                 </Typography>
                             </CardContent>
 
-                            <Box sx={{ width: '100%', height: IMAGE_HEIGHT, position: 'relative' }}>
+                            <Box sx={{width: '100%', height: IMAGE_HEIGHT, position: 'relative'}}>
                                 {review.coverFile ? (
                                     <CardMedia
                                         component="img"
@@ -164,7 +154,7 @@ const ContentReviewList = () => {
                                 )}
                             </Box>
 
-                            <CardContent sx={{ p: 2, pt: 1, flex: '1 0 auto' }}>
+                            <CardContent sx={{p: 2, pt: 1, flex: '1 0 auto'}}>
                                 {review.reviewTitle && (
                                     <Typography
                                         variant="h6"

@@ -1,25 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+    Alert,
+    Button,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
-    TableRow,
-    Paper,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    CircularProgress,
-    Alert
+    TableRow
 } from '@mui/material';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 
 const UserManagement = () => {
     const [users, setUsers] = useState([]);
@@ -29,7 +29,8 @@ const UserManagement = () => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const [deleteSuccess, setDeleteSuccess] = useState(null);
-    const [selectedRole, setSelectedRole] = useState(''); const fetchUsers = async () => {
+    const [selectedRole, setSelectedRole] = useState('');
+    const fetchUsers = async () => {
         try {
             const response = await fetchWithSessionCheck('/api/users/all', {
                 headers: {
@@ -67,7 +68,8 @@ const UserManagement = () => {
 
     useEffect(() => {
         fetchUsers();
-    }, []); const handleRoleChange = async (user) => {
+    }, []);
+    const handleRoleChange = async (user) => {
         setSelectedUser(user);
         setSelectedRole(user.role);
         setDialogOpen(true);
@@ -76,7 +78,8 @@ const UserManagement = () => {
     const handleDeleteClick = (user) => {
         setSelectedUser(user);
         setDeleteDialogOpen(true);
-    }; const handleDeleteConfirm = async () => {
+    };
+    const handleDeleteConfirm = async () => {
         try {
             const response = await fetchWithSessionCheck(`/api/users/${selectedUser.id}`, {
                 method: 'DELETE',
@@ -106,7 +109,8 @@ const UserManagement = () => {
             console.error('Error deleting user:', err);
             setError(err.message);
         }
-    }; const handleUpdateRole = async () => {
+    };
+    const handleUpdateRole = async () => {
         try {
             const response = await fetchWithSessionCheck(`/api/users/${selectedUser.id}/role`, {
                 method: 'PUT',
@@ -114,7 +118,7 @@ const UserManagement = () => {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ role: selectedRole })
+                body: JSON.stringify({role: selectedRole})
             });
 
             if (!response.ok) {
@@ -125,10 +129,10 @@ const UserManagement = () => {
             const updatedUser = await response.json();
 
             const updatedUsers = users.map(user =>
-                user.id === selectedUser.id ? { ...user, role: updatedUser.role } : user
+                user.id === selectedUser.id ? {...user, role: updatedUser.role} : user
             );
             setUsers(updatedUsers);
-            setError(null); 
+            setError(null);
             setDialogOpen(false);
         } catch (err) {
             console.error('Error updating user role:', err);
@@ -137,21 +141,22 @@ const UserManagement = () => {
     };
 
     if (loading) {
-        return <CircularProgress />;
+        return <CircularProgress/>;
     }
 
     if (error) {
         return <Alert severity="error">{error}</Alert>;
-    } return (
+    }
+    return (
         <>
             {error && (
-                <Alert severity="error" sx={{ mb: 2 }}>
+                <Alert severity="error" sx={{mb: 2}}>
                     {error}
                 </Alert>
             )}
 
             {deleteSuccess && (
-                <Alert severity="success" sx={{ mb: 2 }}>
+                <Alert severity="success" sx={{mb: 2}}>
                     {deleteSuccess.message} ({deleteSuccess.reviewsDeleted} reviews deleted)
                 </Alert>
             )}
@@ -173,24 +178,24 @@ const UserManagement = () => {
                                 <TableCell>{user.id}</TableCell>
                                 <TableCell>{user.username}</TableCell>
                                 <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.role}</TableCell>                                <TableCell>
+                                <TableCell>{user.role}</TableCell> <TableCell>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => handleRoleChange(user)}
+                                    sx={{mr: 1}}
+                                >
+                                    Change Role
+                                </Button>
+                                {user.role !== 'ROLE_ADMIN' && (
                                     <Button
                                         variant="contained"
-                                        onClick={() => handleRoleChange(user)}
-                                        sx={{ mr: 1 }}
+                                        color="error"
+                                        onClick={() => handleDeleteClick(user)}
                                     >
-                                        Change Role
+                                        Delete
                                     </Button>
-                                    {user.role !== 'ROLE_ADMIN' && (
-                                        <Button
-                                            variant="contained"
-                                            color="error"
-                                            onClick={() => handleDeleteClick(user)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    )}
-                                </TableCell>
+                                )}
+                            </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -200,7 +205,7 @@ const UserManagement = () => {
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
                 <DialogTitle>Change User Role</DialogTitle>
                 <DialogContent>
-                    <FormControl fullWidth sx={{ mt: 2 }}>
+                    <FormControl fullWidth sx={{mt: 2}}>
                         <InputLabel>Role</InputLabel>
                         <Select
                             value={selectedRole}
@@ -217,7 +222,7 @@ const UserManagement = () => {
                     <Button onClick={handleUpdateRole} color="primary">
                         Update
                     </Button>
-                </DialogActions>            </Dialog>
+                </DialogActions> </Dialog>
 
             <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
                 <DialogTitle>Confirm Delete User</DialogTitle>

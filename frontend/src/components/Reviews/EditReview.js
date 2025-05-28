@@ -1,20 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-    Container,
-    Typography,
-    TextField,
-    Button,
-    Box,
-    MenuItem,
-    Alert,
-    Paper,
-    CircularProgress
-} from '@mui/material';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Alert, Box, Button, CircularProgress, Container, MenuItem, Paper, TextField, Typography} from '@mui/material';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 
 const EditReview = () => {
-    const { reviewId } = useParams();
+    const {reviewId} = useParams();
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
         contentType: '',
@@ -27,7 +17,8 @@ const EditReview = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [previewUrl, setPreviewUrl] = useState(null); useEffect(() => {
+    const [previewUrl, setPreviewUrl] = useState(null);
+    useEffect(() => {
 
         const fetchReview = async () => {
             try {
@@ -64,13 +55,14 @@ const EditReview = () => {
     }, [reviewId]);
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
         setError(null);
-    }; const resizeImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.7) => {
+    };
+    const resizeImage = (file, maxWidth = 1200, maxHeight = 1200, quality = 0.7) => {
         return new Promise((resolve) => {
             const reader = new FileReader();
 
@@ -151,7 +143,8 @@ const EditReview = () => {
             }
         }
         setError(null);
-    }; const handleSubmit = async (e) => {
+    };
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
         setSuccess(false);
@@ -197,35 +190,35 @@ const EditReview = () => {
     };
 
     const contentTypes = [
-        { value: 'game', label: 'Game' },
-        { value: 'movie', label: 'Movie' },
-        { value: 'tvseries', label: 'TV Series' },
-        { value: 'book', label: 'Book' }
+        {value: 'game', label: 'Game'},
+        {value: 'movie', label: 'Movie'},
+        {value: 'tvseries', label: 'TV Series'},
+        {value: 'book', label: 'Book'}
     ];
 
     if (loading) {
         return (
-            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
+            <Container sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
+                <CircularProgress/>
             </Container>
         );
     }
 
     return (
         <Container maxWidth="md">
-            <Paper elevation={3} sx={{ p: 4, mt: 4 }}>
+            <Paper elevation={3} sx={{p: 4, mt: 4}}>
                 <Typography variant="h4" component="h1" gutterBottom align="center">
                     Edit Review
                 </Typography>
 
                 {error && (
-                    <Alert severity="error" sx={{ mb: 2 }}>
+                    <Alert severity="error" sx={{mb: 2}}>
                         {error}
                     </Alert>
                 )}
 
                 {success && (
-                    <Alert severity="success" sx={{ mb: 2 }}>
+                    <Alert severity="success" sx={{mb: 2}}>
                         Review updated successfully! Redirecting...
                     </Alert>
                 )}
@@ -283,12 +276,12 @@ const EditReview = () => {
                         disabled={loading}
                     />
 
-                    <Box sx={{ mt: 2, mb: 2 }}>
+                    <Box sx={{mt: 2, mb: 2}}>
                         <input
                             accept="image/*"
                             id="cover-file"
                             type="file"
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                             onChange={handleFileChange}
                             disabled={loading}
                         />
@@ -303,7 +296,7 @@ const EditReview = () => {
                             </Button>
                         </label>
                         {previewUrl && (
-                            <Box sx={{ mt: 2, textAlign: 'center' }}>
+                            <Box sx={{mt: 2, textAlign: 'center'}}>
                                 <img
                                     src={previewUrl}
                                     alt="Cover preview"
@@ -323,9 +316,9 @@ const EditReview = () => {
                         variant="contained"
                         size="large"
                         disabled={loading}
-                        sx={{ mt: 2 }}
+                        sx={{mt: 2}}
                     >
-                        {loading ? <CircularProgress size={24} /> : 'Update Review'}
+                        {loading ? <CircularProgress size={24}/> : 'Update Review'}
                     </Button>
                 </Box>
             </Paper>

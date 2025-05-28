@@ -1,14 +1,17 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.Review;
-import com.example.demo.model.User;
 import com.example.demo.repository.ReviewRepository;
 import com.example.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.security.Principal;
 import java.util.List;
@@ -35,8 +38,8 @@ public class ReviewController {
                             Model model) {
         try {
             if (contentType == null || contentType.trim().isEmpty() ||
-                contentTitle == null || contentTitle.trim().isEmpty() ||
-                reviewDescription == null || reviewDescription.trim().isEmpty()) {
+                    contentTitle == null || contentTitle.trim().isEmpty() ||
+                    reviewDescription == null || reviewDescription.trim().isEmpty()) {
                 model.addAttribute("error", "Wszystkie pola oznaczone jako wymagane muszą być wypełnione");
                 return "add-review";
             }
@@ -52,14 +55,14 @@ public class ReviewController {
                     extension = originalFilename.substring(originalFilename.lastIndexOf('.'));
                 }
 
-                fileName = UUID.randomUUID().toString() + extension;
+                fileName = UUID.randomUUID() + extension;
                 cover.transferTo(new File(uploadDir, fileName));
             }
 
             Integer userID = getUserIDFromPrincipal(principal);
-            Review review = new Review(userID, contentType.trim(), contentTitle.trim(), 
-                reviewTitle != null ? reviewTitle.trim() : null,
-                reviewDescription.trim(), fileName);
+            Review review = new Review(userID, contentType.trim(), contentTitle.trim(),
+                    reviewTitle != null ? reviewTitle.trim() : null,
+                    reviewDescription.trim(), fileName);
 
             reviewRepository.save(review);
             return "redirect:/reviews/user/" + userID;

@@ -23,15 +23,15 @@ public class User {
     @Transient
     private Integer reviewCount;
 
-    public enum Role {
-        ROLE_USER, ROLE_ADMIN
-    }
-
     public User(String username, String password, String email) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.role = Role.ROLE_USER;
         this.reviewCount = 0;
+    }
+
+    public enum Role {
+        ROLE_USER, ROLE_ADMIN
     }
 }

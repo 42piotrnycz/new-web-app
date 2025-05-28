@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { fetchWithSessionCheck } from '../../services/auth';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {fetchWithSessionCheck} from '../../services/auth';
 import {
-    Container,
-    Typography,
-    Card,
-    CardContent,
-    CardMedia,
-    Grid,
-    CircularProgress,
     Alert,
     Box,
     Button,
+    Card,
+    CardContent,
+    CardMedia,
+    CircularProgress,
+    Container,
+    Grid,
     ToggleButton,
-    ToggleButtonGroup
+    ToggleButtonGroup,
+    Typography
 } from '@mui/material';
 
 const CARD_HEIGHT = 500;
@@ -29,7 +29,8 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [reviewUsernames, setReviewUsernames] = useState({});
     const [selectedType, setSelectedType] = useState('All');
-    const navigate = useNavigate(); useEffect(() => {
+    const navigate = useNavigate();
+    useEffect(() => {
         const fetchLatestReviews = async () => {
             try {
                 const response = await fetchWithSessionCheck('/api/reviews/latest', {
@@ -96,30 +97,30 @@ const Home = () => {
 
     if (loading) {
         return (
-            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
+            <Container sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
+                <CircularProgress/>
             </Container>
         );
     }
 
     if (error) {
         return (
-            <Container sx={{ mt: 4 }}>
+            <Container sx={{mt: 4}}>
                 <Alert severity="error">{error}</Alert>
             </Container>
         );
     }
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
+        <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
+            <Typography variant="h4" component="h1" gutterBottom align="center" sx={{mb: 4}}>
                 Welcome to REviewer 2.0
             </Typography>
-            <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+            <Typography variant="h5" component="h2" gutterBottom sx={{mb: 3}}>
                 Latest Reviews
             </Typography>
 
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+            <Box sx={{mb: 3, display: 'flex', justifyContent: 'center'}}>
                 <ToggleButtonGroup
                     value={selectedType}
                     exclusive
@@ -144,14 +145,14 @@ const Home = () => {
                 </ToggleButtonGroup>
             </Box>
 
-            <Grid container spacing={3} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <Grid container spacing={3} sx={{display: 'flex', justifyContent: 'flex-start'}}>
                 {filteredReviews.length === 0 ? (
-                    <Box sx={{ width: '100%', mt: 2, display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{width: '100%', mt: 2, display: 'flex', justifyContent: 'center'}}>
                         <Alert severity="info">No reviews found for this category.</Alert>
                     </Box>
                 ) : (
                     filteredReviews.map(review => (
-                        <Grid item key={review.reviewID} sx={{ width: CARD_WIDTH, m: 1 }}>
+                        <Grid item key={review.reviewID} sx={{width: CARD_WIDTH, m: 1}}>
                             <Card
                                 sx={{
                                     width: CARD_WIDTH,
@@ -167,8 +168,8 @@ const Home = () => {
                                 }}
                                 onClick={() => handleReviewClick(review.reviewID)}
                             >
-                                <CardContent sx={{ p: 2, pb: 0, flex: '0 0 auto' }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                                <CardContent sx={{p: 2, pb: 0, flex: '0 0 auto'}}>
+                                    <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 1}}>
                                         <Typography
                                             variant="body2"
                                             color="text.secondary"
@@ -218,7 +219,7 @@ const Home = () => {
                                     </Typography>
                                 </CardContent>
 
-                                <Box sx={{ width: '100%', height: IMAGE_HEIGHT, position: 'relative' }}>
+                                <Box sx={{width: '100%', height: IMAGE_HEIGHT, position: 'relative'}}>
                                     {review.coverFile ? (
                                         <CardMedia
                                             component="img"
@@ -247,7 +248,7 @@ const Home = () => {
                                     )}
                                 </Box>
 
-                                <CardContent sx={{ p: 2, pt: 1, flex: '1 0 auto' }}>
+                                <CardContent sx={{p: 2, pt: 1, flex: '1 0 auto'}}>
                                     {review.reviewTitle && (
                                         <Typography
                                             variant="h6"

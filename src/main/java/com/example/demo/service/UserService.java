@@ -8,6 +8,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.util.Optional;
 
 @Service
@@ -29,15 +30,15 @@ public class UserService {
 
     public Integer getUserIdByUsername(String username) {
         return userRepository.findByUsername(username)
-            .map(User::getId)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+                .map(User::getId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
     public String getCurrentUsername() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return userRepository.findByUsername(auth.getName())
-            .map(User::getUsername)
-            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .map(User::getUsername)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     public Optional<User> findById(Long id) {

@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, {useCallback, useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {
+    Box,
+    CircularProgress,
     Container,
-    Typography,
-    TextField,
+    IconButton,
+    InputAdornment,
     List,
     ListItem,
-    ListItemText,
     ListItemButton,
+    ListItemText,
     Paper,
-    InputAdornment,
-    IconButton,
-    CircularProgress,
-    Box
+    TextField,
+    Typography
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 
 const UserSearch = () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -45,7 +45,9 @@ const UserSearch = () => {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    } const handleSearch = async (term = searchTerm) => {
+    }
+
+    const handleSearch = async (term = searchTerm) => {
         if (!term.trim()) {
             setUsers([]);
             return;
@@ -53,7 +55,7 @@ const UserSearch = () => {
 
         setLoading(true);
         setError(null);
-        
+
         try {
             const response = await fetchWithSessionCheck(`/api/users/search?username=${encodeURIComponent(term)}`, {
                 headers: {
@@ -96,12 +98,12 @@ const UserSearch = () => {
     };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Container maxWidth="md" sx={{mt: 4}}>
             <Typography variant="h4" component="h1" gutterBottom align="center">
                 Search Users
             </Typography>
 
-            <Paper sx={{ p: 2, mb: 2 }}>
+            <Paper sx={{p: 2, mb: 2}}>
                 <TextField
                     fullWidth
                     variant="outlined"
@@ -113,14 +115,14 @@ const UserSearch = () => {
                         startAdornment: (
                             <InputAdornment position="start">
                                 <IconButton onClick={handleSearch} disabled={loading}>
-                                    <SearchIcon />
+                                    <SearchIcon/>
                                 </IconButton>
                             </InputAdornment>
                         ),
                         endAdornment: searchTerm && (
                             <InputAdornment position="end">
                                 <IconButton onClick={handleClear} disabled={loading}>
-                                    <ClearIcon />
+                                    <ClearIcon/>
                                 </IconButton>
                             </InputAdornment>
                         )
@@ -130,13 +132,13 @@ const UserSearch = () => {
             </Paper>
 
             {loading && (
-                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
-                    <CircularProgress />
+                <Box sx={{display: 'flex', justifyContent: 'center', mt: 2}}>
+                    <CircularProgress/>
                 </Box>
             )}
 
             {error && (
-                <Typography color="error" sx={{ mt: 2, textAlign: 'center' }}>
+                <Typography color="error" sx={{mt: 2, textAlign: 'center'}}>
                     {error}
                 </Typography>
             )}
@@ -147,7 +149,7 @@ const UserSearch = () => {
                         {users.map((user) => (
                             <ListItem key={user.id} disablePadding>
                                 <ListItemButton onClick={() => handleUserClick(user.id)}>
-                                    <ListItemText primary={user.username} />
+                                    <ListItemText primary={user.username}/>
                                 </ListItemButton>
                             </ListItem>
                         ))}
@@ -156,7 +158,7 @@ const UserSearch = () => {
             )}
 
             {!loading && !error && users.length === 0 && searchTerm && (
-                <Typography sx={{ mt: 2, textAlign: 'center', color: 'text.secondary' }}>
+                <Typography sx={{mt: 2, textAlign: 'center', color: 'text.secondary'}}>
                     No users found matching "{searchTerm}"
                 </Typography>
             )}

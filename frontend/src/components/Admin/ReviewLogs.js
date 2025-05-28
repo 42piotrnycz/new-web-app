@@ -1,9 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import {
-    Typography, Paper, Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Alert, CircularProgress, Box, Chip
+    Alert,
+    Box,
+    Chip,
+    CircularProgress,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography
 } from '@mui/material';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 
 const ReviewLogs = () => {
     const [logs, setLogs] = useState([]);
@@ -14,7 +24,7 @@ const ReviewLogs = () => {
             setLoading(true);
             setError('');
             const response = await fetchWithSessionCheck('/api/logs/reviews', {
-                headers: { 'Content-Type': 'application/json' },
+                headers: {'Content-Type': 'application/json'},
             });
 
             if (response.ok) {
@@ -59,7 +69,7 @@ const ReviewLogs = () => {
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                <CircularProgress />
+                <CircularProgress/>
             </Box>
         );
     }
@@ -69,11 +79,11 @@ const ReviewLogs = () => {
     }
 
     return (
-        <Paper sx={{ p: 3 }}>
+        <Paper sx={{p: 3}}>
             <Typography variant="h6" component="h2" gutterBottom>
                 Review Activity Logs
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+            <Typography variant="body2" color="text.secondary" sx={{mb: 3}}>
                 Monitor review creation, updates, and deletion activities
             </Typography>
 
