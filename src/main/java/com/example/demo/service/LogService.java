@@ -20,9 +20,6 @@ public class LogService {
     private final ReviewLogRepository reviewLogRepository;
     private final AdminLogRepository adminLogRepository;
 
-    /**
-     * Log user activity
-     */
     public void logUserActivity(Integer userID, String operation) {
         try {
             UserLog userLog = new UserLog(null, userID, operation, ZonedDateTime.now());
@@ -33,9 +30,6 @@ public class LogService {
         }
     }
 
-    /**
-     * Log review activity
-     */
     public void logReviewActivity(Integer reviewID, String operation) {
         try {
             Integer nextLogId = getNextReviewLogId();
@@ -47,9 +41,6 @@ public class LogService {
         }
     }
 
-    /**
-     * Log admin activity
-     */
     public void logAdminActivity(Integer adminUserID, String operation) {
         try {
             AdminLog adminLog = new AdminLog(null, adminUserID, operation, ZonedDateTime.now());
@@ -60,9 +51,6 @@ public class LogService {
         }
     }
 
-    /**
-     * Get next available review log ID (since it's not auto-generated)
-     */
     private Integer getNextReviewLogId() {
         try {
             return reviewLogRepository.findAll()

@@ -25,9 +25,6 @@ public class RefreshTokenService {
     @Value("${app.refresh-token.expiration-days:7}")
     private int refreshTokenExpirationDays;
 
-    /**
-     * Create a new refresh token for a user
-     */
     @Transactional
     public String createRefreshToken(User user) {
         revokeAllUserTokens(user);
@@ -48,17 +45,11 @@ public class RefreshTokenService {
         return tokenValue;
     }
 
-    /**
-     * Validate a refresh token
-     */
     public Optional<RefreshToken> validateRefreshToken(String token) {
         return refreshTokenRepository.findByTokenAndRevokeFalse(token)
                 .filter(refreshToken -> refreshToken.getExpiryDate().isAfter(LocalDateTime.now()));
     }
 
-    /**
-     * Revoke a specific refresh token
-     */
     @Transactional
     public void revokeRefreshToken(String token) {
         refreshTokenRepository.findByTokenAndRevokeFalse(token)
@@ -69,9 +60,6 @@ public class RefreshTokenService {
                 });
     }
 
-    /**
-     * Revoke all refresh tokens for a user
-     */
     @Transactional
     public void revokeAllUserTokens(User user) {
         refreshTokenRepository.findByUserAndRevokeFalse(user)
@@ -82,9 +70,7 @@ public class RefreshTokenService {
         log.debug("Revoked all refresh tokens for user: {}", user.getUsername());
     }
 
-    /**
-     * Clean up expired tokens
-     */
+
     @Transactional
     public void cleanupExpiredTokens() {
         LocalDateTime now = LocalDateTime.now();
@@ -94,18 +80,12 @@ public class RefreshTokenService {
         }
     }
 
-    /**
-     * Check if user has any valid refresh tokens
-     */
     public boolean hasValidRefreshToken(User user) {
         return refreshTokenRepository.findByUserAndRevokeFalse(user)
                 .stream()
                 .anyMatch(token -> token.getExpiryDate().isAfter(LocalDateTime.now()));
     }
 
-    /**
-     * Check if user has any valid refresh tokens by username
-     */
     public boolean hasValidRefreshToken(String username) {
         return userRepository.findByUsername(username)
                 .map(this::hasValidRefreshToken)
