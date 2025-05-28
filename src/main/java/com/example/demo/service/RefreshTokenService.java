@@ -40,6 +40,7 @@ public class RefreshTokenService {
                 .token(tokenValue)
                 .user(user)
                 .expiryDate(expiryDate)
+                .revoke(false)
                 .build();
 
         refreshTokenRepository.save(refreshToken);
@@ -52,7 +53,7 @@ public class RefreshTokenService {
      * Validate a refresh token
      */
     public Optional<RefreshToken> validateRefreshToken(String token) {
-        return refreshTokenRepository.findByTokenAndRevokedFalse(token)
+        return refreshTokenRepository.findByTokenAndRevokeFalse(token)
                 .filter(refreshToken -> refreshToken.getExpiryDate().isAfter(LocalDateTime.now()));
     }
 
@@ -61,9 +62,9 @@ public class RefreshTokenService {
      */
     @Transactional
     public void revokeRefreshToken(String token) {
-        refreshTokenRepository.findByTokenAndRevokedFalse(token)
+        refreshTokenRepository.findByTokenAndRevokeFalse(token)
                 .ifPresent(refreshToken -> {
-                    refreshToken.setRevoked(true);
+                    refreshToken.setRevoke(true);
                     refreshTokenRepository.save(refreshToken);
                     log.debug("Revoked refresh token: {}", token);
                 });
@@ -74,9 +75,9 @@ public class RefreshTokenService {
      */
     @Transactional
     public void revokeAllUserTokens(User user) {
-        refreshTokenRepository.findByUserAndRevokedFalse(user)
+        refreshTokenRepository.findByUserAndRevokeFalse(user)
                 .forEach(token -> {
-                    token.setRevoked(true);
+                    token.setRevoke(true);
                     refreshTokenRepository.save(token);
                 });
         log.debug("Revoked all refresh tokens for user: {}", user.getUsername());
@@ -98,7 +99,7 @@ public class RefreshTokenService {
      * Check if user has any valid refresh tokens
      */
     public boolean hasValidRefreshToken(User user) {
-        return refreshTokenRepository.findByUserAndRevokedFalse(user)
+        return refreshTokenRepository.findByUserAndRevokeFalse(user)
                 .stream()
                 .anyMatch(token -> token.getExpiryDate().isAfter(LocalDateTime.now()));
     }

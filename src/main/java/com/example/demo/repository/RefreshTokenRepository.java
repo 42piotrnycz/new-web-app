@@ -18,12 +18,12 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     /**
      * Find a non-revoked refresh token by token value
      */
-    Optional<RefreshToken> findByTokenAndRevokedFalse(String token);
+    Optional<RefreshToken> findByTokenAndRevokeFalse(String token);
 
     /**
      * Find all non-revoked refresh tokens for a user
      */
-    List<RefreshToken> findByUserAndRevokedFalse(User user);
+    List<RefreshToken> findByUserAndRevokeFalse(User user);
 
     /**
      * Find a refresh token by token value regardless of revocation status
@@ -41,13 +41,11 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
      * Revoke all tokens for a specific user
      */
     @Modifying
-    @Query("UPDATE RefreshToken rt SET rt.revoked = true WHERE rt.user = :user AND rt.revoked = false")
-    int revokeAllTokensForUser(@Param("user") User user);
-
-    /**
+    @Query("UPDATE RefreshToken rt SET rt.revoke = true WHERE rt.user = :user AND rt.revoke = false")
+    int revokeAllTokensForUser(@Param("user") User user);    /**
      * Count valid (non-revoked, non-expired) tokens for a user
      */
-    @Query("SELECT COUNT(rt) FROM RefreshToken rt WHERE rt.user = :user AND rt.revoked = false AND rt.expiryDate > :currentTime")
+    @Query("SELECT COUNT(rt) FROM RefreshToken rt WHERE rt.user = :user AND rt.revoke = false AND rt.expiryDate > :currentTime")
     long countValidTokensForUser(@Param("user") User user, @Param("currentTime") LocalDateTime currentTime);
 
     /**
