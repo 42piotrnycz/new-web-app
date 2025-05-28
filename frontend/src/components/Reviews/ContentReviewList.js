@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
-import {Alert, Box, Card, CardContent, CardMedia, CircularProgress, Container, Grid, Typography} from '@mui/material';
-import {fetchWithSessionCheck} from '../../utils/sessionUtils';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Alert, Box, Card, CardContent, CardMedia, CircularProgress, Container, Grid, Typography } from '@mui/material';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const CARD_HEIGHT = 500;
 const CARD_WIDTH = 345;
 const IMAGE_HEIGHT = 200;
 
 const ContentReviewList = () => {
-    const {contentTitle} = useParams();
+    const { contentTitle } = useParams();
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -49,15 +49,15 @@ const ContentReviewList = () => {
 
     if (loading) {
         return (
-            <Container sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
-                <CircularProgress/>
+            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <CircularProgress />
             </Container>
         );
     }
 
     if (error) {
         return (
-            <Container sx={{mt: 4}}>
+            <Container sx={{ mt: 4 }}>
                 <Alert severity="error">{error}</Alert>
             </Container>
         );
@@ -65,37 +65,49 @@ const ContentReviewList = () => {
 
     if (reviews.length === 0) {
         return (
-            <Container sx={{mt: 4}}>
+            <Container sx={{ mt: 4 }}>
                 <Alert severity="info">No reviews found for "{contentTitle}"</Alert>
             </Container>
         );
     }
 
     return (
-        <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
+        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
             <Typography variant="h4" component="h1" gutterBottom>
                 Reviews for "{contentTitle}"
-            </Typography>
-
-            <Grid container spacing={3} sx={{display: 'flex', justifyContent: 'flex-start'}}>
+            </Typography>            <Grid
+                container
+                spacing={3}
+                justifyContent="center"
+                columns={{ xs: 2, sm: 8, md: 12, lg: 16 }}
+            >
                 {reviews.map(review => (
-                    <Grid item key={review.reviewID} sx={{width: CARD_WIDTH, m: 1}}>
-                        <Card
-                            sx={{
-                                width: CARD_WIDTH,
-                                height: CARD_HEIGHT,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                cursor: 'pointer',
-                                '&:hover': {
-                                    boxShadow: 6,
-                                    transform: 'scale(1.02)',
-                                    transition: 'all 0.2s ease-in-out'
-                                }
-                            }}
-                            onClick={() => handleReviewClick(review.reviewID)}
-                        >
-                            <CardContent sx={{p: 2, pb: 0, flex: '0 0 auto'}}>
+                    <Grid
+                        item
+                        key={review.reviewID}
+                        xs={2}
+                        sm={4}
+                        md={4}
+                        lg={4}
+                        sx={{ display: 'flex', justifyContent: 'center' }}
+                    >                        <Card
+                        sx={{
+                            width: '100%',
+                            maxWidth: '345px',
+                            minWidth: '345px',
+                            height: CARD_HEIGHT,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            cursor: 'pointer',
+                            '&:hover': {
+                                boxShadow: 6,
+                                transform: 'scale(1.02)',
+                                transition: 'all 0.2s ease-in-out'
+                            }
+                        }}
+                        onClick={() => handleReviewClick(review.reviewID)}
+                    >
+                            <CardContent sx={{ p: 2, pb: 0, flex: '0 0 auto' }}>
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"
@@ -123,16 +135,23 @@ const ContentReviewList = () => {
                                 >
                                     {review.contentTitle}
                                 </Typography>
-                            </CardContent>
-
-                            <Box sx={{width: '100%', height: IMAGE_HEIGHT, position: 'relative'}}>
+                            </CardContent>                            <Box sx={{
+                                width: '100%',
+                                height: IMAGE_HEIGHT,
+                                position: 'relative',
+                                overflow: 'hidden',
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center'
+                            }}>
                                 {review.coverFile ? (
                                     <CardMedia
                                         component="img"
                                         sx={{
                                             height: '100%',
                                             width: '100%',
-                                            objectFit: 'cover'
+                                            objectFit: 'cover',
+                                            objectPosition: 'center'
                                         }}
                                         image={`/uploads/${review.coverFile}`}
                                         alt={review.contentTitle}
@@ -154,7 +173,7 @@ const ContentReviewList = () => {
                                 )}
                             </Box>
 
-                            <CardContent sx={{p: 2, pt: 1, flex: '1 0 auto'}}>
+                            <CardContent sx={{ p: 2, pt: 1, flex: '1 0 auto' }}>
                                 {review.reviewTitle && (
                                     <Typography
                                         variant="h6"
