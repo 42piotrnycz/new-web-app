@@ -1,9 +1,8 @@
-import {BrowserRouter as Router, Link, Navigate, Route, Routes} from 'react-router-dom';
-import {useEffect, useState} from 'react';
+import { BrowserRouter as Router, Link, Navigate, Route, Routes } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import {
     AppBar,
     Box,
-    Button,
     Container,
     IconButton,
     Menu,
@@ -25,16 +24,17 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Profile from './components/Profile/Profile';
 import UserSearch from './components/Users/UserSearch';
-import {authService} from './services/auth';
+import NavButton from './components/UI/NavButton';
+import NavContainer from './components/UI/NavContainer';
+import { authService } from './services/auth';
 import './App.css';
 
 function App() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [anchorEl, setAnchorEl] = useState(null);
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const [anchorEl, setAnchorEl] = useState(null); const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const handleMenuOpen = (event) => {
         setAnchorEl(event.currentTarget);
@@ -78,184 +78,192 @@ function App() {
         return <div>Loading...</div>;
     }
     return (
-        <Router>
-            <div className="App" style={{width: '100%', overflow: 'hidden'}}><AppBar position="static"
-                                                                                     sx={{width: '100%'}}>
-                <Toolbar sx={{width: '100%', padding: {xs: '0 8px', sm: '0 16px'}}}>
-                    <Typography variant="h6" style={{flexGrow: 1}}>
-                        REviewer 2.0
-                    </Typography>
+        <Router>            <div className="App" style={{ width: '100%', overflow: 'hidden' }}>            <AppBar
+            position="static"
+            sx={{
+                width: '100%',
+                boxShadow: 2,
+                '& .MuiToolbar-root': {
+                    paddingLeft: { xs: 1, sm: 2 },
+                    paddingRight: { xs: 1, sm: 2 }
+                }
+            }}
+        >
+            <Toolbar sx={{
+                width: '100%',
+                padding: { xs: '0 8px', sm: '0 16px', md: '0 24px' },
+                minHeight: { xs: 56, sm: 64 },
+                justifyContent: 'space-between',
+                pr: { xs: '16px', sm: '24px' },
+                gap: { xs: 1, sm: 2 }
+            }}>                    <Typography
+                variant="h6"
+                sx={{
+                    flexGrow: 1,
+                    fontSize: { xs: '1rem', sm: '1.25rem' },
+                    fontWeight: 500,
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                }}
+            >
+                    REviewer 2.0
+                </Typography>
 
-                    {user ? (
-                        isMobile ? (
-                            <>
-                                <IconButton
-                                    edge="start"
-                                    color="inherit"
-                                    aria-label="menu"
-                                    onClick={handleMenuOpen}
-                                >
-                                    <MenuIcon/>
-                                </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleMenuClose}
-                                >
-                                    {isAdmin && (
-                                        <MenuItem
-                                            component={Link}
-                                            to="/admin"
-                                            onClick={handleMenuClose}
-                                            sx={{
-                                                color: 'error.main',
-                                                fontWeight: 'bold'
-                                            }}
-                                        >
-                                            Admin Panel
-                                        </MenuItem>
-                                    )}
-                                    <MenuItem component={Link} to="/" onClick={handleMenuClose}>Home</MenuItem>
-                                    <MenuItem component={Link} to="/reviews" onClick={handleMenuClose}>My
-                                        Reviews</MenuItem>
-                                    <MenuItem component={Link} to="/add-review" onClick={handleMenuClose}>Add
-                                        Review</MenuItem>
-                                    <MenuItem component={Link} to="/search" onClick={handleMenuClose}>Search
-                                        Users</MenuItem>
-                                    <MenuItem component={Link} to="/profile"
-                                              onClick={handleMenuClose}>Profile</MenuItem>
-                                    <MenuItem onClick={() => {
-                                        handleMenuClose();
-                                        handleLogout();
-                                    }}>Logout</MenuItem>
-                                </Menu>
-                            </>
-                        ) : (
-                            <Box sx={{display: 'flex'}}>
+                {user ? (
+                    isMobile ? (
+                        <>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                onClick={handleMenuOpen}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                            >
                                 {isAdmin && (
-                                    <Button
-                                        color="inherit"
+                                    <MenuItem
                                         component={Link}
                                         to="/admin"
+                                        onClick={handleMenuClose}
                                         sx={{
-                                            backgroundColor: 'error.main',
-                                            '&:hover': {
-                                                backgroundColor: 'error.dark',
-                                            },
-                                            mr: 2
+                                            color: 'error.main',
+                                            fontWeight: 'bold'
                                         }}
                                     >
                                         Admin Panel
-                                    </Button>
+                                    </MenuItem>
                                 )}
-                                <Button color="inherit" component={Link} to="/">
+                                <MenuItem component={Link} to="/" onClick={handleMenuClose}>Home</MenuItem>
+                                <MenuItem component={Link} to="/reviews" onClick={handleMenuClose}>My
+                                    Reviews</MenuItem>
+                                <MenuItem component={Link} to="/add-review" onClick={handleMenuClose}>Add
+                                    Review</MenuItem>
+                                <MenuItem component={Link} to="/search" onClick={handleMenuClose}>Search
+                                    Users</MenuItem>
+                                <MenuItem component={Link} to="/profile"
+                                    onClick={handleMenuClose}>Profile</MenuItem>
+                                <MenuItem onClick={() => {
+                                    handleMenuClose();
+                                    handleLogout();
+                                }}>Logout</MenuItem>
+                            </Menu>                            </>) : (<NavContainer>
+                                {isAdmin && (
+                                    <NavButton to="/admin" isAdmin>
+                                        Admin Panel
+                                    </NavButton>
+                                )}
+                                <NavButton to="/">
                                     Home
-                                </Button>
-                                <Button color="inherit" component={Link} to="/reviews">
+                                </NavButton>
+                                <NavButton to="/reviews">
                                     My Reviews
-                                </Button>
-                                <Button color="inherit" component={Link} to="/add-review">
+                                </NavButton>
+                                <NavButton to="/add-review">
                                     Add Review
-                                </Button>
-                                <Button color="inherit" component={Link} to="/search">
+                                </NavButton>
+                                <NavButton to="/search">
                                     Search Users
-                                </Button>
-                                <Button color="inherit" component={Link} to="/profile">
+                                </NavButton>
+                                <NavButton to="/profile">
                                     Profile
-                                </Button>
-                                <Button color="inherit" onClick={handleLogout}>
+                                </NavButton>
+                                <NavButton onClick={handleLogout}>
                                     Logout
-                                </Button>
-                            </Box>
-                        )
-                    ) : (
-                        isMobile ? (
-                            <>
-                                <IconButton
-                                    edge="start"
-                                    color="inherit"
-                                    aria-label="menu"
-                                    onClick={handleMenuOpen}
-                                >
-                                    <MenuIcon/>
-                                </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl)}
-                                    onClose={handleMenuClose}
-                                >
-                                    <MenuItem component={Link} to="/login" onClick={handleMenuClose}>Login</MenuItem>
-                                    <MenuItem component={Link} to="/register"
-                                              onClick={handleMenuClose}>Register</MenuItem>
-                                </Menu>
-                            </>
-                        ) : (
-                            <>
-                                <Button color="inherit" component={Link} to="/login">
-                                    Login
-                                </Button>
-                                <Button color="inherit" component={Link} to="/register">
-                                    Register
-                                </Button>
-                            </>
-                        )
-                    )}
-                </Toolbar>
-            </AppBar>
+                                </NavButton>
+                            </NavContainer>
+                    )
+                ) : (
+                    isMobile ? (
+                        <>
+                            <IconButton
+                                edge="start"
+                                color="inherit"
+                                aria-label="menu"
+                                onClick={handleMenuOpen}
+                            >
+                                <MenuIcon />
+                            </IconButton>
+                            <Menu
+                                anchorEl={anchorEl}
+                                open={Boolean(anchorEl)}
+                                onClose={handleMenuClose}
+                            >
+                                <MenuItem component={Link} to="/login" onClick={handleMenuClose}>Login</MenuItem>
+                                <MenuItem component={Link} to="/register"
+                                    onClick={handleMenuClose}>Register</MenuItem>
+                            </Menu>
+                        </>) : (<NavContainer>
+                            <NavButton to="/login">
+                                Login
+                            </NavButton>
+                            <NavButton to="/register">
+                                Register
+                            </NavButton>
+                        </NavContainer>
+                    )
+                )}
+            </Toolbar>
+        </AppBar>
 
-                <Container style={{marginTop: '2rem'}}>
-                    <Routes>
-                        <Route path="/login" element={user ? <Navigate to="/"/> : <Login/>}/>
-                        <Route path="/register" element={user ? <Navigate to="/"/> : <Register/>}/>
+            <Container style={{ marginTop: '2rem' }}>
+                <Routes>
+                    <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+                    <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
 
-                        {/* Protected Routes */}
-                        <Route
-                            path="/"
-                            element={user ? <Home/> : <Navigate to="/login"/>}
-                        />
-                        <Route
-                            path="/reviews"
-                            element={user ? <ReviewList userId={user.id}/> : <Navigate to="/login"/>}
-                        /> <Route
+                    {/* Protected Routes */}
+                    <Route
+                        path="/"
+                        element={user ? <Home /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/reviews"
+                        element={user ? <ReviewList userId={user.id} /> : <Navigate to="/login" />}
+                    /> <Route
                         path="/review/:reviewId"
-                        element={user ? <ReviewDetail/> : <Navigate to="/login"/>}
+                        element={user ? <ReviewDetail /> : <Navigate to="/login" />}
                     />
-                        <Route
-                            path="/review/edit/:reviewId"
-                            element={user ? <EditReview/> : <Navigate to="/login"/>}
-                        />
-                        <Route
-                            path="/admin/*"
-                            element={
-                                user && isAdmin ? (
-                                    <AdminPanel/>
-                                ) : (
-                                    <Navigate to="/" replace/>
-                                )
-                            }
-                        /> <Route
+                    <Route
+                        path="/review/edit/:reviewId"
+                        element={user ? <EditReview /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/admin/*"
+                        element={
+                            user && isAdmin ? (
+                                <AdminPanel />
+                            ) : (
+                                <Navigate to="/" replace />
+                            )
+                        }
+                    /> <Route
                         path="/user/:userId/reviews"
-                        element={user ? <ReviewList/> : <Navigate to="/login"/>}
+                        element={user ? <ReviewList /> : <Navigate to="/login" />}
                     />
-                        <Route
-                            path="/content/:contentTitle"
-                            element={user ? <ContentReviewList/> : <Navigate to="/login"/>}
-                        />
-                        <Route
-                            path="/add-review"
-                            element={user ? <AddReview/> : <Navigate to="/login"/>}
-                        />
-                        <Route
-                            path="/profile"
-                            element={user ? <Profile/> : <Navigate to="/login"/>}
-                        />
-                        <Route
-                            path="/search"
-                            element={user ? <UserSearch/> : <Navigate to="/login"/>}
-                        />
-                    </Routes>
-                </Container>
-            </div>
+                    <Route
+                        path="/content/:contentTitle"
+                        element={user ? <ContentReviewList /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/add-review"
+                        element={user ? <AddReview /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/profile"
+                        element={user ? <Profile /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/search"
+                        element={user ? <UserSearch /> : <Navigate to="/login" />}
+                    />
+                </Routes>
+            </Container>
+        </div>
         </Router>
     );
 }
