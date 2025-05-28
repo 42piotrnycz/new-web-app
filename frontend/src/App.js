@@ -1,6 +1,19 @@
 import {BrowserRouter as Router, Link, Navigate, Route, Routes} from 'react-router-dom';
 import {useEffect, useState} from 'react';
-import {AppBar, Button, Container, Toolbar, Typography} from '@mui/material';
+import {
+    AppBar,
+    Box,
+    Button,
+    Container,
+    IconButton,
+    Menu,
+    MenuItem,
+    Toolbar,
+    Typography,
+    useMediaQuery,
+    useTheme
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
 import Home from './components/Home/Home';
 import AdminPanel from './components/Admin/AdminPanel';
 import ReviewList from './components/Reviews/ReviewList';
@@ -19,6 +32,17 @@ function App() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
     useEffect(() => {
         const checkAuth = async () => {
             try {
@@ -53,63 +77,131 @@ function App() {
     if (loading) {
         return <div>Loading...</div>;
     }
-
     return (
         <Router>
-            <div className="App">
-                <AppBar position="static">
-                    <Toolbar>
-                        <Typography variant="h6" style={{flexGrow: 1}}>
-                            REviewer 2.0
-                        </Typography> {user ? (
-                        <>
-                            {isAdmin && (
-                                <Button
+            <div className="App" style={{width: '100%', overflow: 'hidden'}}><AppBar position="static"
+                                                                                     sx={{width: '100%'}}>
+                <Toolbar sx={{width: '100%', padding: {xs: '0 8px', sm: '0 16px'}}}>
+                    <Typography variant="h6" style={{flexGrow: 1}}>
+                        REviewer 2.0
+                    </Typography>
+
+                    {user ? (
+                        isMobile ? (
+                            <>
+                                <IconButton
+                                    edge="start"
                                     color="inherit"
-                                    component={Link}
-                                    to="/admin"
-                                    sx={{
-                                        backgroundColor: 'error.main',
-                                        '&:hover': {
-                                            backgroundColor: 'error.dark',
-                                        },
-                                        mr: 2
-                                    }}
+                                    aria-label="menu"
+                                    onClick={handleMenuOpen}
                                 >
-                                    Admin Panel
+                                    <MenuIcon/>
+                                </IconButton>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                >
+                                    {isAdmin && (
+                                        <MenuItem
+                                            component={Link}
+                                            to="/admin"
+                                            onClick={handleMenuClose}
+                                            sx={{
+                                                color: 'error.main',
+                                                fontWeight: 'bold'
+                                            }}
+                                        >
+                                            Admin Panel
+                                        </MenuItem>
+                                    )}
+                                    <MenuItem component={Link} to="/" onClick={handleMenuClose}>Home</MenuItem>
+                                    <MenuItem component={Link} to="/reviews" onClick={handleMenuClose}>My
+                                        Reviews</MenuItem>
+                                    <MenuItem component={Link} to="/add-review" onClick={handleMenuClose}>Add
+                                        Review</MenuItem>
+                                    <MenuItem component={Link} to="/search" onClick={handleMenuClose}>Search
+                                        Users</MenuItem>
+                                    <MenuItem component={Link} to="/profile"
+                                              onClick={handleMenuClose}>Profile</MenuItem>
+                                    <MenuItem onClick={() => {
+                                        handleMenuClose();
+                                        handleLogout();
+                                    }}>Logout</MenuItem>
+                                </Menu>
+                            </>
+                        ) : (
+                            <Box sx={{display: 'flex'}}>
+                                {isAdmin && (
+                                    <Button
+                                        color="inherit"
+                                        component={Link}
+                                        to="/admin"
+                                        sx={{
+                                            backgroundColor: 'error.main',
+                                            '&:hover': {
+                                                backgroundColor: 'error.dark',
+                                            },
+                                            mr: 2
+                                        }}
+                                    >
+                                        Admin Panel
+                                    </Button>
+                                )}
+                                <Button color="inherit" component={Link} to="/">
+                                    Home
                                 </Button>
-                            )}
-                            <Button color="inherit" component={Link} to="/">
-                                Home
-                            </Button>
-                            <Button color="inherit" component={Link} to="/reviews">
-                                My Reviews
-                            </Button>
-                            <Button color="inherit" component={Link} to="/add-review">
-                                Add Review
-                            </Button>
-                            <Button color="inherit" component={Link} to="/search">
-                                Search Users
-                            </Button>
-                            <Button color="inherit" component={Link} to="/profile">
-                                Profile
-                            </Button>
-                            <Button color="inherit" onClick={handleLogout}>
-                                Logout
-                            </Button>
-                        </>
+                                <Button color="inherit" component={Link} to="/reviews">
+                                    My Reviews
+                                </Button>
+                                <Button color="inherit" component={Link} to="/add-review">
+                                    Add Review
+                                </Button>
+                                <Button color="inherit" component={Link} to="/search">
+                                    Search Users
+                                </Button>
+                                <Button color="inherit" component={Link} to="/profile">
+                                    Profile
+                                </Button>
+                                <Button color="inherit" onClick={handleLogout}>
+                                    Logout
+                                </Button>
+                            </Box>
+                        )
                     ) : (
-                        <>
-                            <Button color="inherit" component={Link} to="/login">
-                                Login
-                            </Button>
-                            <Button color="inherit" component={Link} to="/register">
-                                Register
-                            </Button>
-                        </>
+                        isMobile ? (
+                            <>
+                                <IconButton
+                                    edge="start"
+                                    color="inherit"
+                                    aria-label="menu"
+                                    onClick={handleMenuOpen}
+                                >
+                                    <MenuIcon/>
+                                </IconButton>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl)}
+                                    onClose={handleMenuClose}
+                                >
+                                    <MenuItem component={Link} to="/login" onClick={handleMenuClose}>Login</MenuItem>
+                                    <MenuItem component={Link} to="/register"
+                                              onClick={handleMenuClose}>Register</MenuItem>
+                                </Menu>
+                            </>
+                        ) : (
+                            <>
+                                <Button color="inherit" component={Link} to="/login">
+                                    Login
+                                </Button>
+                                <Button color="inherit" component={Link} to="/register">
+                                    Register
+                                </Button>
+                            </>
+                        )
                     )}
-                    </Toolbar>
-                </AppBar>
+                </Toolbar>
+            </AppBar>
 
                 <Container style={{marginTop: '2rem'}}>
                     <Routes>
