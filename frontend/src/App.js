@@ -26,6 +26,7 @@ import Profile from './components/Profile/Profile';
 import UserSearch from './components/Users/UserSearch';
 import NavButton from './components/UI/NavButton';
 import NavContainer from './components/UI/NavContainer';
+import NotFound from './components/UI/NotFound';
 import { authService } from './services/auth';
 import './App.css';
 
@@ -256,10 +257,13 @@ function App() {
                         path="/profile"
                         element={user ? <Profile /> : <Navigate to="/login" />}
                     />
+                   
                     <Route
                         path="/search"
                         element={user ? <UserSearch /> : <Navigate to="/login" />}
                     />
+                    
+                    <Route path="*" element={<NotFound />} />
                 </Routes>
             </Container>
         </div>
