@@ -16,7 +16,7 @@ The platform allows users to share their opinions on movies, books, games, and t
 ### Backend
 - **Spring Boot** - framework
 - **Spring Security** - authentication and security
-- **Spring Data JPA** - warstwa dostępu do danych
+- **Spring Data JPA** - data access layer
 - **Jakarta** - ORM (mapping objects to database entities) (specification)
 - **Hibernate** ORM (implementation)
 - **JWT** - secure tokens
