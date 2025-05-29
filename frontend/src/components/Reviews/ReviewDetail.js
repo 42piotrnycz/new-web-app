@@ -157,8 +157,7 @@ const ReviewDetail = () => {
             )}
 
             <Card>
-                <CardContent>
-                    {currentUser && (
+                <CardContent>                    {currentUser && (
                         <>                            {(Number(currentUser.id) === Number(review.userID) || currentUser.role === 'ROLE_ADMIN') && (
                             <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
                                 <Button
@@ -166,14 +165,14 @@ const ReviewDetail = () => {
                                     color="primary"
                                     onClick={() => navigate(`/review/edit/${reviewId}`)}
                                 >
-                                    Edit Review
+                                    {currentUser.role === 'ROLE_ADMIN' && Number(currentUser.id) !== Number(review.userID) ? 'ADMIN: EDIT REVIEW' : 'Edit Review'}
                                 </Button>
                                 <Button
                                     variant="contained"
                                     color="error"
                                     onClick={() => setDeleteDialogOpen(true)}
                                 >
-                                    Delete Review
+                                    {currentUser.role === 'ROLE_ADMIN' && Number(currentUser.id) !== Number(review.userID) ? 'ADMIN: DELETE REVIEW' : 'Delete Review'}
                                 </Button>
                             </Box>
                         )}
