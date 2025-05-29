@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useNavigate, useParams} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
     Alert,
     Box,
@@ -15,10 +15,10 @@ import {
     DialogTitle,
     Typography
 } from '@mui/material';
-import {fetchWithSessionCheck} from '../../utils/sessionUtils';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const ReviewDetail = () => {
-    const {reviewId} = useParams();
+    const { reviewId } = useParams();
     const navigate = useNavigate();
     const [review, setReview] = useState(null);
     const [user, setUser] = useState(null);
@@ -37,6 +37,11 @@ const ReviewDetail = () => {
                 });
                 if (response.ok) {
                     const userData = await response.json();
+
+                    if (userData && userData.id) {
+                        userData.id = Number(userData.id);
+                    }
+
                     setCurrentUser(userData);
                 }
             } catch (err) {
@@ -57,6 +62,11 @@ const ReviewDetail = () => {
                 }
 
                 const reviewData = await response.json();
+
+                if (reviewData && reviewData.userID) {
+                    reviewData.userID = Number(reviewData.userID);
+                }
+
                 setReview(reviewData);
 
                 const userResponse = await fetchWithSessionCheck(`/api/users/${reviewData.userID}`, {
@@ -107,15 +117,15 @@ const ReviewDetail = () => {
 
     if (loading) {
         return (
-            <Container sx={{display: 'flex', justifyContent: 'center', mt: 4}}>
-                <CircularProgress/>
+            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                <CircularProgress />
             </Container>
         );
     }
 
     if (error) {
         return (
-            <Container sx={{mt: 4}}>
+            <Container sx={{ mt: 4 }}>
                 <Alert severity="error">{error}</Alert>
             </Container>
         );
@@ -123,55 +133,58 @@ const ReviewDetail = () => {
 
     if (!review) {
         return (
-            <Container sx={{mt: 4}}>
+            <Container sx={{ mt: 4 }}>
                 <Alert severity="info">Review not found</Alert>
             </Container>
         );
     }
 
     return (
-        <Container maxWidth="md" sx={{mt: 4}}>
-            <Box sx={{mb: 3}}>
+        <Container maxWidth="md" sx={{ mt: 4 }}>
+            <Box sx={{ mb: 3 }}>
                 <Button
                     component={Link}
                     to={`/user/${user?.id}/reviews`}
                     color="primary"
-                    sx={{textTransform: 'none', fontSize: '1.1rem'}}
+                    sx={{ textTransform: 'none', fontSize: '1.1rem' }}
                 >
                     {user?.username}
                 </Button>
             </Box> {success && (
-            <Alert severity="success" sx={{mb: 2}}>
-                {success}
-            </Alert>
-        )}
+                <Alert severity="success" sx={{ mb: 2 }}>
+                    {success}
+                </Alert>
+            )}
 
             <Card>
                 <CardContent>
-                    {currentUser && (currentUser.id === review.userID || currentUser.role === 'ROLE_ADMIN') && (
-                        <Box sx={{display: 'flex', gap: 2, mb: 2}}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                onClick={() => navigate(`/review/edit/${reviewId}`)}
-                            >
-                                Edit Review
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={() => setDeleteDialogOpen(true)}
-                            >
-                                Delete Review
-                            </Button>
-                        </Box>
-                    )} <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{mb: 1, textTransform: 'uppercase'}}
-                >
-                    {review.contentType}
-                </Typography>
+                    {currentUser && (
+                        <>                            {(Number(currentUser.id) === Number(review.userID) || currentUser.role === 'ROLE_ADMIN') && (
+                            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    onClick={() => navigate(`/review/edit/${reviewId}`)}
+                                >
+                                    Edit Review
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    color="error"
+                                    onClick={() => setDeleteDialogOpen(true)}
+                                >
+                                    Delete Review
+                                </Button>
+                            </Box>
+                        )}
+                        </>
+                    )}<Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1, textTransform: 'uppercase' }}
+                    >
+                        {review.contentType}
+                    </Typography>
                     <Typography
                         variant="h4"
                         component={Link}

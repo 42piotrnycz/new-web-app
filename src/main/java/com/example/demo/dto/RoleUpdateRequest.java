@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleUpdateRequest {
-    
-    @Schema(description = "Role to assign to the user", example = "ROLE_ADMIN", 
-            allowableValues = {"ROLE_USER", "ROLE_ADMIN"}, required = true)
+
+    @Schema(description = "Role to assign to the user", example = "ROLE_ADMIN", allowableValues = { "ROLE_USER",
+            "ROLE_ADMIN" }, required = true)
     private String role;
 }

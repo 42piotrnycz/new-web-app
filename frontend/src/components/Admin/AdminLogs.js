@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
     Alert,
     Box,
@@ -13,7 +13,7 @@ import {
     TableRow,
     Typography
 } from '@mui/material';
-import {fetchWithSessionCheck} from '../../utils/sessionUtils';
+import { fetchWithSessionCheck } from '../../utils/sessionUtils';
 
 const AdminLogs = () => {
     const [logs, setLogs] = useState([]);
@@ -25,7 +25,7 @@ const AdminLogs = () => {
             setLoading(true);
             setError('');
             const response = await fetchWithSessionCheck('/api/logs/admin', {
-                headers: {'Content-Type': 'application/json'},
+                headers: { 'Content-Type': 'application/json' },
             });
 
             if (response.ok) {
@@ -69,22 +69,22 @@ const AdminLogs = () => {
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                <CircularProgress/>
+                <CircularProgress />
             </Box>
         );
     }
 
     if (error) {
         return <Alert severity="error">{error}</Alert>;
-    }    return (
-        <Paper sx={{p: { xs: 1, sm: 2, md: 3 }, width: '100%', overflow: 'hidden' }}>
+    } return (
+        <Paper sx={{ p: { xs: 1, sm: 2, md: 3 }, width: '100%', overflow: 'hidden' }}>
             <Typography variant="h6" component="h2" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
                 Admin Activity Logs
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{mb: { xs: 1, sm: 2, md: 3 }}}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: { xs: 1, sm: 2, md: 3 } }}>
                 Monitor administrative actions performed in the system
             </Typography>
-            
+
             {logs.length === 0 ? (
                 <Alert severity="info">No admin logs found.</Alert>
             ) : (
