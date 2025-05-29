@@ -66,7 +66,6 @@ const ReviewForm = ({
                         needsResize = true;
                     }
 
-                    // If the image is smaller than our max dimensions, don't resize
                     if (!needsResize) {
                         resolve(file);
                         return;
@@ -103,11 +102,8 @@ const ReviewForm = ({
         const file = e.target.files[0];
         if (file) {
             try {
-                // Create preview URL first
                 const url = URL.createObjectURL(file);
                 setPreviewUrl(url);
-
-                // Resize the image if it's too large
                 const resizedFile = await resizeImage(file);
 
                 setFormData(prev => ({
@@ -115,14 +111,9 @@ const ReviewForm = ({
                     cover: resizedFile
                 }));
 
-                // Log the file sizes for reference
-                console.log(`Original file size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
-                console.log(`Resized file size: ${(resizedFile.size / 1024 / 1024).toFixed(2)}MB`);
-
             } catch (err) {
                 console.error('Error resizing image:', err);
 
-                // If error occurs, still set the original file
                 setFormData(prev => ({
                     ...prev,
                     cover: file
@@ -134,8 +125,7 @@ const ReviewForm = ({
     const handleFormSubmit = async (e) => {
         e.preventDefault();
 
-        // Check if image size is still too large
-        if (formData.cover && formData.cover.size > 5 * 1024 * 1024) { // 5MB limit
+        if (formData.cover && formData.cover.size > 5 * 1024 * 1024) {
             return { error: "Image is still too large. Maximum allowed size is 5MB." };
         }
 

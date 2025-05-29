@@ -59,10 +59,8 @@ const Profile = () => {
             const result = await response.json();
             setSuccess('Profile deleted successfully. Redirecting to login...');
 
-            // Clear authentication
             localStorage.removeItem('token');
 
-            // Redirect after showing success message
             setTimeout(() => {
                 navigate('/login');
             }, 2000);

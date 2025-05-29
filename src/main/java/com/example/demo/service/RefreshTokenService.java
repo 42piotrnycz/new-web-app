@@ -29,7 +29,6 @@ public class RefreshTokenService {
     public String createRefreshToken(User user) {
         revokeAllUserTokens(user);
 
-        // Create new refresh token
         String tokenValue = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusDays(refreshTokenExpirationDays);
         RefreshToken refreshToken = RefreshToken.builder()

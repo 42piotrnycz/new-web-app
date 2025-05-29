@@ -88,7 +88,6 @@ public class UserRestController {
 
             Integer userId = userService.getUserIdByUsername(credentials.get("username"));
 
-            // Find the user entity for refresh token creation
             User user = userRepository.findByUsername(credentials.get("username"))
                     .orElseThrow(() -> new RuntimeException("User not found after authentication"));
 
@@ -103,7 +102,7 @@ public class UserRestController {
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(24 * 60 * 60) // 24 hours
+                    .maxAge(24 * 60 * 60)
                     .sameSite("Strict")
                     .build();
 
@@ -111,7 +110,7 @@ public class UserRestController {
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(7 * 24 * 60 * 60) // 7 days
+                    .maxAge(7 * 24 * 60 * 60)
                     .sameSite("Strict")
                     .build();
 
@@ -366,15 +365,12 @@ public class UserRestController {
             Principal principal) {
         return userRepository.findById(id)
                 .map(user -> {
-                    // Prevent self-deletion and admin deletion
                     if (user.getRole() == User.Role.ROLE_ADMIN) {
                         return ResponseEntity.badRequest().body(Map.of("error", "Cannot delete admin users"));
                     }
                     try {
-                        // Delete all reviews by this user first
                         List<Review> userReviews = reviewRepository.findByUserID(user.getId());
 
-                        // Delete cover files first
                         for (Review review : userReviews) {
                             if (review.getCoverFile() != null && !review.getCoverFile().isEmpty()) {
                                 File coverFile = new File("uploads", review.getCoverFile());
@@ -384,7 +380,6 @@ public class UserRestController {
                             }
                         }
 
-                        // Then delete the reviews from database
                         reviewRepository.deleteAll(userReviews);
                         userRepository.delete(user);
 
@@ -414,7 +409,6 @@ public class UserRestController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, Principal principal) {
         try {
-            // Revoke refresh token from database if user is authenticated
             if (principal != null) {
                 User user = userRepository.findByUsername(principal.getName())
                         .orElse(null);
@@ -425,10 +419,8 @@ public class UserRestController {
             }
         } catch (Exception e) {
             log.warn("Error revoking refresh tokens during logout", e);
-            // Continue with logout even if token revocation fails
         }
 
-        // Clear the JWT cookie
         ResponseCookie jwtCookie = ResponseCookie.from("jwt", "")
                 .httpOnly(true)
                 .secure(false)
@@ -437,7 +429,6 @@ public class UserRestController {
                 .sameSite("Strict")
                 .build();
 
-        // Clear the refresh token cookie
         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
                 .httpOnly(true)
                 .secure(false)
@@ -469,7 +460,6 @@ public class UserRestController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         try {
-            // Extract refresh token from cookie
             String refreshToken = null;
             if (request.getCookies() != null) {
                 for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
@@ -492,7 +482,6 @@ public class UserRestController {
             var refreshTokenEntity = refreshTokenOpt.get();
             var user = refreshTokenEntity.getUser();
 
-            // Generate new JWT token
             String newJwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
             log.info("Generated new JWT for user: {}", user.getUsername());
 
@@ -500,7 +489,7 @@ public class UserRestController {
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(24 * 60 * 60) // 24 hours
+                    .maxAge(24 * 60 * 60)
                     .sameSite("Strict")
                     .build();
 
@@ -531,7 +520,6 @@ public class UserRestController {
     @PostMapping("/revoke-refresh")
     public ResponseEntity<?> revokeRefreshToken(HttpServletRequest request) {
         try {
-            // Extract refresh token from cookie
             String refreshToken = null;
             if (request.getCookies() != null) {
                 for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
@@ -549,7 +537,6 @@ public class UserRestController {
             refreshTokenService.revokeRefreshToken(refreshToken);
             log.info("Revoked refresh token");
 
-            // Clear the refresh token cookie
             ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
                     .httpOnly(true)
                     .secure(false)

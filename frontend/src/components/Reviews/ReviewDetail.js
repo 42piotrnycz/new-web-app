@@ -59,7 +59,6 @@ const ReviewDetail = () => {
                 const reviewData = await response.json();
                 setReview(reviewData);
 
-                // Fetch user details
                 const userResponse = await fetchWithSessionCheck(`/api/users/${reviewData.userID}`, {
                     headers: {
                         'Accept': 'application/json'

@@ -35,7 +35,6 @@ const NavButton = ({ to, onClick, color = 'inherit', sx = {}, children, isAdmin 
         ...adminStyles
     };
 
-    // If "to" prop is provided, render as a Link, otherwise as a regular button
     return to ? (
         <Button
             color={color}

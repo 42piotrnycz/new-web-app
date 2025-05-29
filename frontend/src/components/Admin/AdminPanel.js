@@ -82,8 +82,8 @@ const AdminPanel = () => {
                         maxHeight: { xs: 'calc(100vh - 200px)', sm: 'auto' },
                         overflowY: { xs: 'auto', sm: 'visible' },
                         overflowX: 'hidden',
-                        WebkitOverflowScrolling: 'touch', // Better scrolling on iOS
-                        '-webkit-overflow-scrolling': 'touch' // For older iOS devices
+                        WebkitOverflowScrolling: 'touch', 
+                        '-webkit-overflow-scrolling': 'touch' 
                     }}
                 >
                     <Routes>

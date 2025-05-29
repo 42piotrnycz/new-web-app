@@ -56,7 +56,6 @@ const EditReview = () => {
 
         const data = new FormData();
 
-        // Only include cover in formData if it has changed
         Object.keys(formData).forEach(key => {
             if (formData[key] != null && !(key === 'cover' && !formData[key])) {
                 data.append(key, formData[key]);

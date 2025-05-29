@@ -164,7 +164,7 @@ const UserManagement = () => {
         <>
             <Typography variant="h6" component="h2" gutterBottom sx={{ 
                 fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                display: { sm: 'none' } // Only show on mobile as title is already in AdminPanel
+                display: { sm: 'none' }
             }}>
                 User Management
             </Typography>

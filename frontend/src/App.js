@@ -50,7 +50,6 @@ function App() {
                 if (userData) {
                     setUser(userData);
                     setIsAdmin(userData.role === 'ROLE_ADMIN');
-                    // Update role in localStorage in case it changed
                     localStorage.setItem('role', userData.role);
                 } else {
                     setUser(null);

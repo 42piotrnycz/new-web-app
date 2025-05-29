@@ -269,15 +269,12 @@ public class ReviewRestController {
                     .orElseThrow(() -> new RuntimeException("User not found"))
                     .getId();
 
-            // Check if the user is the owner of the review
             if (!review.getUserID().equals(userID)) {
                 return ResponseEntity.status(403).body(Map.of("error", "Not authorized to update this review"));
             }
 
-            // Handle cover file
-            String fileName = review.getCoverFile(); // Keep existing cover file name by default
+            String fileName = review.getCoverFile();
             if (!keepExistingCover && coverFile != null && !coverFile.isEmpty()) {
-                // Delete old cover file if it exists
                 if (review.getCoverFile() != null && !review.getCoverFile().isEmpty()) {
                     File oldCover = new File(new File("uploads").getAbsolutePath(), review.getCoverFile());
                     if (oldCover.exists()) {
@@ -285,7 +282,6 @@ public class ReviewRestController {
                     }
                 }
 
-                // Save new cover file
                 String uploadDir = new File("uploads").getAbsolutePath();
                 new File(uploadDir).mkdirs();
 
@@ -299,7 +295,6 @@ public class ReviewRestController {
                 coverFile.transferTo(new File(uploadDir, fileName));
             }
 
-            // Update review properties
             review.setContentType(contentType.trim());
             review.setContentTitle(contentTitle.trim());
             review.setReviewTitle(reviewTitle != null ? reviewTitle.trim() : null);

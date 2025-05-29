@@ -62,13 +62,11 @@ public class OpenApiConfig {
                 pathItem.readOperations().forEach(operation -> {
                     ApiResponses apiResponses = operation.getResponses();
 
-                    // Ensure apiResponses is not null and initialized
                     if (apiResponses == null) {
                         apiResponses = new ApiResponses();
                         operation.setResponses(apiResponses);
                     }
 
-                    // Add common response codes if they don't exist
                     if (!apiResponses.containsKey("401")) {
                         apiResponses.addApiResponse("401", new ApiResponse().description("Unauthorized: Authentication required or token expired"));
                     }
@@ -82,7 +80,6 @@ public class OpenApiConfig {
                         apiResponses.addApiResponse("500", new ApiResponse().description("Internal Server Error: Something went wrong on the server"));
                     }
 
-                    // Sort responses by status code
                     Map<String, ApiResponse> sortedResponses = new TreeMap<>(apiResponses);
                     apiResponses.clear();
                     sortedResponses.forEach(apiResponses::addApiResponse);
