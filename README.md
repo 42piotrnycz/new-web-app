@@ -12,6 +12,16 @@ The platform allows users to share their opinions on movies, books, games, and t
 - **Comprehensive Logging:** Detailed activity logs for users, reviews, and administrative actions
 - **REST API:** Well-documented API with Swagger/OpenAPI integration
 
+# Run instruction:
+### Frontend:
+`cd frontend`
+`npm install`
+`npm start`
+
+### Backend:
+`mvn clean install`
+`mvn spring-boot:run`
+
 # List of used tools and technologies within the project:
 ### Backend
 - **Spring Boot** - framework
