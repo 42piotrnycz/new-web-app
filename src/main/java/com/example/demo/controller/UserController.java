@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public String profilePage(@RequestParam Long id, Model model) {
+    public String profilePage(@RequestParam Integer id, Model model) {
         return userService.findById(id)
                 .map(user -> {
                     model.addAttribute("user", user);

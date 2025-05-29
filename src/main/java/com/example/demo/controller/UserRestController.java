@@ -1,9 +1,7 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Review;
 import com.example.demo.model.User;
 import com.example.demo.security.JwtUtil;
-import com.example.demo.service.LogService;
 import com.example.demo.service.RefreshTokenService;
 import com.example.demo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +26,6 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.File;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
@@ -199,10 +196,9 @@ public class UserRestController {
                     }
                     """))),
             @ApiResponse(responseCode = "404", description = "User not found")
-    })
-    @GetMapping("/{id}")
+    })    @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(
-            @Parameter(description = "User ID", required = true, example = "1") @PathVariable Long id) {
+            @Parameter(description = "User ID", required = true, example = "1") @PathVariable Integer id) {
         return userService.findById(id)
                 .map(user -> ResponseEntity.ok().body(Map.of(
                         "id", user.getId(),
@@ -267,16 +263,15 @@ public class UserRestController {
                     """))),
             @ApiResponse(responseCode = "403", description = "Access denied - admin role required"),
             @ApiResponse(responseCode = "404", description = "User not found")
-    })
-    @PutMapping("/{id}/role")
+    })    @PutMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateUserRole(
-            @Parameter(description = "User ID", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "User ID", required = true, example = "1") @PathVariable Integer id,
             @Parameter(description = "Role update request", required = true, example = "{\"role\": \"ROLE_ADMIN\"}") @RequestBody Map<String, String> request,
             Principal principal) {
         try {
             String newRole = request.get("role");
-            User updatedUser = userService.updateUserRole(id.intValue(), newRole, principal);
+            User updatedUser = userService.updateUserRole(id, newRole, principal);
 
             return ResponseEntity.ok(Map.of(
                     "message", "Role updated successfully",
@@ -345,14 +340,13 @@ public class UserRestController {
                         "error": "Failed to delete user: Database error"
                     }
                     """)))
-    })
-    @DeleteMapping("/{id}")
+    })    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(
-            @Parameter(description = "User ID to delete", required = true, example = "1") @PathVariable Long id,
+            @Parameter(description = "User ID to delete", required = true, example = "1") @PathVariable Integer id,
             Principal principal) {
         try {
-            userService.deleteUser(id.intValue(), principal);
+            userService.deleteUser(id, principal);
             return ResponseEntity.ok(Map.of("message", "User and all their reviews deleted successfully"));
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
