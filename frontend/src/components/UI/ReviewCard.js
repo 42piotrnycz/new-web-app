@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-    Box,
-    Card,
-    CardContent,
-    CardMedia,
-    Typography,
-    Button
-} from '@mui/material';
+import {Box, Button, Card, CardContent, CardMedia, Typography} from '@mui/material';
+import FavoriteButton from './FavoriteButton';
 
 const CARD_HEIGHT = 500;
 const IMAGE_HEIGHT = 200;
@@ -15,12 +9,14 @@ const IMAGE_HEIGHT = 200;
  * review card component that displays review information in a consistent format
  */
 const ReviewCard = ({
-    review,
-    onClick,
-    onUserClick,
-    username,
-    showUsername = false
-}) => {
+                        review,
+                        onClick,
+                        onUserClick,
+                        username,
+                        showUsername = false,
+                        showFavoriteButton = true,
+                        onFavoriteChange
+                    }) => {
     const handleUserClick = (e) => {
         if (onUserClick) {
             e.stopPropagation();
@@ -33,7 +29,7 @@ const ReviewCard = ({
             sx={{
                 width: '100%',
                 maxWidth: '345px',
-                minWidth: { xs: 'auto', sm: '300px' },
+                minWidth: {xs: 'auto', sm: '300px'},
                 height: CARD_HEIGHT,
                 display: 'flex',
                 flexDirection: 'column',
@@ -46,8 +42,8 @@ const ReviewCard = ({
             }}
             onClick={onClick}
         >
-            <CardContent sx={{ p: 2, pb: 0, flex: '0 0 auto' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <CardContent sx={{p: 2, pb: 0, flex: '0 0 auto'}}>
+                <Box sx={{display: 'flex', justifyContent: 'space-between', mb: 1}}>
                     <Typography
                         variant="body2"
                         color="text.secondary"
@@ -96,7 +92,6 @@ const ReviewCard = ({
                     {review.contentTitle}
                 </Typography>
             </CardContent>
-
             <Box sx={{
                 width: '100%',
                 height: IMAGE_HEIGHT,
@@ -106,6 +101,23 @@ const ReviewCard = ({
                 justifyContent: 'center',
                 alignItems: 'center'
             }}>
+                {showFavoriteButton && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            top: 8,
+                            right: 8,
+                            zIndex: 2,
+                            bgcolor: 'rgba(255, 255, 255, 0.9)',
+                            borderRadius: '50%',
+                            p: 0.5
+                        }}
+                    > <FavoriteButton
+                        reviewId={review.reviewID}
+                        onFavoriteChange={onFavoriteChange}
+                    />
+                    </Box>
+                )}
                 {review.coverFile ? (
                     <CardMedia
                         component="img"
@@ -135,7 +147,7 @@ const ReviewCard = ({
                 )}
             </Box>
 
-            <CardContent sx={{ p: 2, pt: 1, flex: '1 0 auto' }}>
+            <CardContent sx={{p: 2, pt: 1, flex: '1 0 auto'}}>
                 {review.reviewTitle && (
                     <Typography
                         variant="h6"

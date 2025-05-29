@@ -1,13 +1,12 @@
-
 import React from 'react';
-import { Box, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import {Box, ToggleButton, ToggleButtonGroup} from '@mui/material';
 
 const CONTENT_TYPES = ['All', 'movie', 'tvseries', 'game', 'book'];
 
 /**
  * Content filter component for filtering reviews by content type
  */
-const ContentFilter = ({ selectedType, onTypeChange, contentTypes = CONTENT_TYPES }) => {
+const ContentFilter = ({selectedType, onTypeChange, contentTypes = CONTENT_TYPES}) => {
     return (
         <Box sx={{
             mb: 3,
@@ -23,12 +22,12 @@ const ContentFilter = ({ selectedType, onTypeChange, contentTypes = CONTENT_TYPE
                 aria-label="content type"
                 color="primary"
                 sx={{
-                    flexWrap: { xs: 'nowrap', md: 'wrap' },
+                    flexWrap: {xs: 'nowrap', md: 'wrap'},
                     '& .MuiToggleButton-root': {
                         textTransform: 'none',
-                        px: { xs: 2, sm: 3 },
-                        minWidth: { xs: 'auto', sm: 'auto' },
-                        fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                        px: {xs: 2, sm: 3},
+                        minWidth: {xs: 'auto', sm: 'auto'},
+                        fontSize: {xs: '0.8rem', sm: '0.875rem'}
                     }
                 }}
             >

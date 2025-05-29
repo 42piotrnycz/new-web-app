@@ -29,7 +29,7 @@ public class ReviewRestController {
     private final ReviewService reviewService;
 
     @Operation(summary = "Get Reviews by User ID", description = "Retrieve all reviews created by a specific user.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -60,7 +60,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Get Review by ID", description = "Retrieve a specific review by its unique identifier.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review found successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -84,7 +84,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Get Latest Reviews", description = "Retrieve the 25 most recently created reviews.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Latest reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -116,7 +116,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Get Reviews by Content Title", description = "Retrieve all reviews for a specific content title.", tags = {
-            "Review Retrieval" })
+            "Review Retrieval"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Reviews retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -157,7 +157,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Create New Review", description = "Create a new review with optional cover image upload. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Review Management" })
+            "Review Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review created successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -201,7 +201,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Update Review", description = "Update an existing review. Only the review owner can update their reviews. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Review Management" })
+            "Review Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review updated successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -254,7 +254,7 @@ public class ReviewRestController {
     }
 
     @Operation(summary = "Delete Review", description = "Delete a review. Only the review owner can delete their reviews. Requires authentication.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Review Management" })
+            "Review Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Review deleted successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {

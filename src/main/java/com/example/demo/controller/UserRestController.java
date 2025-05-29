@@ -45,7 +45,7 @@ public class UserRestController {
     private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "User Login", description = "Authenticate user with username and password. Returns JWT token for subsequent API calls.", tags = {
-            "Authentication" })
+            "Authentication"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class), examples = @ExampleObject(value = """
                     {
@@ -123,7 +123,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "User Registration", description = "Register a new user account with username, password, and email.", tags = {
-            "Authentication" })
+            "Authentication"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Registration successful", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -186,7 +186,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Get User by ID", description = "Retrieve user details by their unique identifier.", tags = {
-            "User Management" })
+            "User Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -196,7 +196,8 @@ public class UserRestController {
                     }
                     """))),
             @ApiResponse(responseCode = "404", description = "User not found")
-    })    @GetMapping("/{id}")
+    })
+    @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(
             @Parameter(description = "User ID", required = true, example = "1") @PathVariable Integer id) {
         return userService.findById(id)
@@ -208,7 +209,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Get All Users", description = "Retrieve a list of all users in the system. Requires admin privileges.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Admin" })
+            "Admin"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -246,7 +247,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Update User Role", description = "Update the role of a specific user. Requires admin privileges.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Admin" })
+            "Admin"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role updated successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -263,7 +264,8 @@ public class UserRestController {
                     """))),
             @ApiResponse(responseCode = "403", description = "Access denied - admin role required"),
             @ApiResponse(responseCode = "404", description = "User not found")
-    })    @PutMapping("/{id}/role")
+    })
+    @PutMapping("/{id}/role")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateUserRole(
             @Parameter(description = "User ID", required = true, example = "1") @PathVariable Integer id,
@@ -289,7 +291,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Search Users", description = "Search for users by username using case-insensitive partial matching.", tags = {
-            "User Management" })
+            "User Management"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search completed successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -321,7 +323,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Delete User", description = "Delete a user and all their reviews. Admin users cannot be deleted. Requires admin privileges.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Admin" })
+            "Admin"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User deleted successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -340,7 +342,8 @@ public class UserRestController {
                         "error": "Failed to delete user: Database error"
                     }
                     """)))
-    })    @DeleteMapping("/{id}")
+    })
+    @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(
             @Parameter(description = "User ID to delete", required = true, example = "1") @PathVariable Integer id,
@@ -360,7 +363,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "User Logout", description = "Logout user by clearing the JWT cookie.", tags = {
-            "Authentication" })
+            "Authentication"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Logout successful", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -399,7 +402,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Refresh JWT Token", description = "Use refresh token to get a new JWT token.", tags = {
-            "Authentication" })
+            "Authentication"})
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Token refreshed successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {

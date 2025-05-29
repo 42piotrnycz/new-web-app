@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import {Box} from '@mui/material';
 
 /**
  * Container component for navigation buttons
@@ -8,16 +8,16 @@ import { Box } from '@mui/material';
  * @param {Object} props.sx
  * @returns {JSX.Element}
  */
-const NavContainer = ({ children, sx = {} }) => {
+const NavContainer = ({children, sx = {}}) => {
 
     const baseStyles = {
         display: 'flex',
-        gap: { xs: 0.5, sm: 1 },
+        gap: {xs: 0.5, sm: 1},
         alignItems: 'center',
         flexWrap: 'nowrap',
         overflow: 'auto',
-        mr: { xs: 1, sm: 2 },
-        pr: { xs: 2, sm: 3 },
+        mr: {xs: 1, sm: 2},
+        pr: {xs: 2, sm: 3},
         scrollBehavior: 'smooth',
         '&::-webkit-scrollbar': {
             display: 'none'

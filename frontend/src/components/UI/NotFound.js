@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Button, Container, Typography } from '@mui/material';
-import { Link } from 'react-router-dom';
+import {Box, Button, Container, Typography} from '@mui/material';
+import {Link} from 'react-router-dom';
 import ErrorIcon from '@mui/icons-material/Error';
 
 const NotFound = () => {
@@ -17,14 +17,14 @@ const NotFound = () => {
                     mt: 4,
                 }}
             >
-                <ErrorIcon sx={{ fontSize: 100, color: 'error.main', mb: 2 }} />
+                <ErrorIcon sx={{fontSize: 100, color: 'error.main', mb: 2}}/>
                 <Typography variant="h2" component="h1" gutterBottom>
                     404
                 </Typography>
                 <Typography variant="h4" gutterBottom>
                     Page Not Found
                 </Typography>
-                <Typography variant="body1" sx={{ mb: 4, maxWidth: '600px' }}>
+                <Typography variant="body1" sx={{mb: 4, maxWidth: '600px'}}>
                     The page you are looking for might have been removed, had its name changed,
                     or is temporarily unavailable.
                 </Typography>

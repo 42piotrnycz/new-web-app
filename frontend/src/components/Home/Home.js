@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { fetchWithSessionCheck } from '../../services/auth';
-import {
-    Container,
-    Typography
-} from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {fetchWithSessionCheck} from '../../services/auth';
+import {Container, Typography} from '@mui/material';
 import LoadingState from '../UI/LoadingState';
 import ContentFilter from '../UI/ContentFilter';
 import ReviewGrid from '../UI/ReviewGrid';
@@ -26,7 +23,8 @@ const Home = () => {
                     headers: {
                         'Accept': 'application/json'
                     }
-                }); const data = await response.json();
+                });
+                const data = await response.json();
 
                 if (!response.ok) {
                     throw new Error(data.error || 'Failed to fetch reviews');
@@ -80,7 +78,8 @@ const Home = () => {
 
     const handleReviewClick = (reviewId) => {
         navigate(`/review/${reviewId}`);
-    }; return (
+    };
+    return (
         <>
             <LoadingState
                 loading={loading}
@@ -88,11 +87,11 @@ const Home = () => {
             />
 
             {!loading && !error && (
-                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                    <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
+                <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
+                    <Typography variant="h4" component="h1" gutterBottom align="center" sx={{mb: 4}}>
                         Welcome to REviewer 2.0
                     </Typography>
-                    <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
+                    <Typography variant="h5" component="h2" gutterBottom sx={{mb: 3}}>
                         Latest Reviews
                     </Typography>
 
@@ -109,7 +108,7 @@ const Home = () => {
                         usernames={reviewUsernames}
                         showUsernames={true}
                         noResultsMessage="No reviews found for this category."
-                    />                </Container>
+                    /> </Container>
             )}
         </>
     );

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import React, {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 import ReviewForm from '../UI/ReviewForm';
 
 const AddReview = () => {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button } from '@mui/material';
-import { Link } from 'react-router-dom';
+import {Button} from '@mui/material';
+import {Link} from 'react-router-dom';
 
 /**
  * Navigation button component
@@ -11,13 +11,13 @@ import { Link } from 'react-router-dom';
  * @param {Object} props.sx
  * @param {React.ReactNode} props.children
  * @param {boolean} props.isAdmin
- * @returns {JSX.Element} 
+ * @returns {JSX.Element}
  */
-const NavButton = ({ to, onClick, color = 'inherit', sx = {}, children, isAdmin = false }) => {
+const NavButton = ({to, onClick, color = 'inherit', sx = {}, children, isAdmin = false}) => {
     const baseStyles = {
-        px: { xs: 1, sm: 2 },
-        py: { xs: 0.5, sm: 1 },
-        fontSize: { xs: '0.75rem', sm: '0.875rem' },
+        px: {xs: 1, sm: 2},
+        py: {xs: 0.5, sm: 1},
+        fontSize: {xs: '0.75rem', sm: '0.875rem'},
         minWidth: 'auto',
         whiteSpace: 'nowrap',
         ...sx

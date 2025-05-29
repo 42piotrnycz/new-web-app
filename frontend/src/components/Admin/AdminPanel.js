@@ -31,68 +31,69 @@ const AdminPanel = () => {
             default:
                 navigate('/admin');
         }
-    };    return (
-        <Container 
-            maxWidth="lg" 
+    };
+    return (
+        <Container
+            maxWidth="lg"
             sx={{
-                mt: { xs: 2, sm: 3, md: 4 }, 
-                px: { xs: 1, sm: 2, md: 3 },
+                mt: {xs: 2, sm: 3, md: 4},
+                px: {xs: 1, sm: 2, md: 3},
                 width: '100%'
             }}>
-            <Typography 
-                variant="h4" 
-                component="h1" 
-                gutterBottom 
+            <Typography
+                variant="h4"
+                component="h1"
+                gutterBottom
                 align="center"
-                sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.25rem' } }}
+                sx={{fontSize: {xs: '1.5rem', sm: '2rem', md: '2.25rem'}}}
             >
                 Admin Panel
             </Typography>
-            <Paper 
+            <Paper
                 sx={{
-                    mt: { xs: 2, sm: 3 }, 
-                    width: '100%', 
+                    mt: {xs: 2, sm: 3},
+                    width: '100%',
                     overflow: 'hidden',
-                    borderRadius: { xs: '4px', sm: '8px' },
-                    boxShadow: { xs: 1, sm: 2, md: 3 }
-                }}>                <Tabs
-                    value={currentTab()}
-                    onChange={handleChange}
-                    indicatorColor="primary"
-                    textColor="primary"
-                    centered={false}
-                    variant="scrollable"
-                    scrollButtons="auto"
-                    allowScrollButtonsMobile
-                    sx={{
-                        '& .MuiTab-root': {
-                            fontSize: { xs: '0.75rem', sm: '0.875rem' },
-                            minWidth: { xs: 'auto', sm: 80 },
-                            padding: { xs: '6px 8px', sm: '12px 16px' }
-                        }
-                    }}
-                >
-                    <Tab label="User Management"/>
-                    <Tab label="User Logs"/>
-                    <Tab label="Review Logs"/>
-                    <Tab label="Admin Logs"/> 
-                </Tabs>                <Box 
-                    sx={{
-                        p: { xs: 1, sm: 2, md: 3 },
-                        maxHeight: { xs: 'calc(100vh - 200px)', sm: 'auto' },
-                        overflowY: { xs: 'auto', sm: 'visible' },
-                        overflowX: 'hidden',
-                        WebkitOverflowScrolling: 'touch', 
-                        '-webkit-overflow-scrolling': 'touch' 
-                    }}
-                >
-                    <Routes>
-                        <Route index element={<UserManagement/>}/>
-                        <Route path="user-logs" element={<UserLogs/>}/>
-                        <Route path="review-logs" element={<ReviewLogs/>}/>
-                        <Route path="admin-logs" element={<AdminLogs/>}/>
-                    </Routes>
-                </Box>
+                    borderRadius: {xs: '4px', sm: '8px'},
+                    boxShadow: {xs: 1, sm: 2, md: 3}
+                }}> <Tabs
+                value={currentTab()}
+                onChange={handleChange}
+                indicatorColor="primary"
+                textColor="primary"
+                centered={false}
+                variant="scrollable"
+                scrollButtons="auto"
+                allowScrollButtonsMobile
+                sx={{
+                    '& .MuiTab-root': {
+                        fontSize: {xs: '0.75rem', sm: '0.875rem'},
+                        minWidth: {xs: 'auto', sm: 80},
+                        padding: {xs: '6px 8px', sm: '12px 16px'}
+                    }
+                }}
+            >
+                <Tab label="User Management"/>
+                <Tab label="User Logs"/>
+                <Tab label="Review Logs"/>
+                <Tab label="Admin Logs"/>
+            </Tabs> <Box
+                sx={{
+                    p: {xs: 1, sm: 2, md: 3},
+                    maxHeight: {xs: 'calc(100vh - 200px)', sm: 'auto'},
+                    overflowY: {xs: 'auto', sm: 'visible'},
+                    overflowX: 'hidden',
+                    WebkitOverflowScrolling: 'touch',
+                    '-webkit-overflow-scrolling': 'touch'
+                }}
+            >
+                <Routes>
+                    <Route index element={<UserManagement/>}/>
+                    <Route path="user-logs" element={<UserLogs/>}/>
+                    <Route path="review-logs" element={<ReviewLogs/>}/>
+                    <Route path="admin-logs" element={<AdminLogs/>}/>
+                </Routes>
+            </Box>
             </Paper>
         </Container>
     );

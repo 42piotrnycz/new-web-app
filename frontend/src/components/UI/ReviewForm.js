@@ -1,42 +1,32 @@
-import React, { useState } from 'react';
-import {
-    Alert,
-    Box,
-    Button,
-    CircularProgress,
-    Container,
-    MenuItem,
-    Paper,
-    TextField,
-    Typography
-} from '@mui/material';
+import React, {useState} from 'react';
+import {Alert, Box, Button, CircularProgress, Container, MenuItem, Paper, TextField, Typography} from '@mui/material';
 
 /**
  * Component for adding or editing reviews
  */
 const ReviewForm = ({
-    initialValues = {
-        contentType: '',
-        contentTitle: '',
-        reviewTitle: '',
-        reviewDescription: '',
-        cover: null
-    },
-    currentCover = null,
-    onSubmit,
-    onCancel,
-    submitButtonText = 'Submit',
-    isEdit = false,
-    isLoading = false,
-    error = null
-}) => {
+                        initialValues = {
+                            contentType: '',
+                            contentTitle: '',
+                            reviewTitle: '',
+                            reviewDescription: '',
+                            cover: null
+                        },
+                        currentCover = null,
+                        onSubmit,
+                        onCancel,
+                        submitButtonText = 'Submit',
+                        isEdit = false,
+                        isLoading = false,
+                        error = null
+                    }) => {
     const [formData, setFormData] = useState(initialValues);
     const [previewUrl, setPreviewUrl] = useState(
         currentCover ? `/uploads/${currentCover}` : null
     );
 
     const handleChange = (e) => {
-        const { name, value } = e.target;
+        const {name, value} = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -71,7 +61,7 @@ const ReviewForm = ({
                         return;
                     }
 
-                    
+
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
@@ -80,7 +70,7 @@ const ReviewForm = ({
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-    
+
                     canvas.toBlob((blob) => {
                         const resizedFile = new File([blob], file.name, {
                             type: file.type,
@@ -126,21 +116,21 @@ const ReviewForm = ({
         e.preventDefault();
 
         if (formData.cover && formData.cover.size > 5 * 1024 * 1024) {
-            return { error: "Image is still too large. Maximum allowed size is 5MB." };
+            return {error: "Image is still too large. Maximum allowed size is 5MB."};
         }
 
         onSubmit(formData);
     };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-            <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 } }}>
+        <Container maxWidth="md" sx={{mt: 4, mb: 4}}>
+            <Paper elevation={3} sx={{p: {xs: 2, sm: 4}}}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     {isEdit ? 'Edit Review' : 'Add New Review'}
                 </Typography>
 
                 {error && (
-                    <Alert severity="error" sx={{ mb: 3 }}>
+                    <Alert severity="error" sx={{mb: 3}}>
                         {error}
                     </Alert>
                 )}
@@ -197,7 +187,7 @@ const ReviewForm = ({
                         rows={5}
                     />
 
-                    <Box sx={{ mt: 3, mb: 3 }}>
+                    <Box sx={{mt: 3, mb: 3}}>
                         <Typography variant="subtitle1" gutterBottom>
                             Cover Image {isEdit ? '(Optional)' : '(Required)'}
                         </Typography>
@@ -207,7 +197,7 @@ const ReviewForm = ({
                             type="file"
                             id="cover-upload"
                             onChange={handleFileChange}
-                            style={{ display: 'none' }}
+                            style={{display: 'none'}}
                         />
 
                         <label htmlFor="cover-upload">
@@ -220,7 +210,7 @@ const ReviewForm = ({
                         </label>
 
                         {previewUrl && (
-                            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}>
+                            <Box sx={{mt: 2, display: 'flex', justifyContent: 'center'}}>
                                 <img
                                     src={previewUrl}
                                     alt="Cover Preview"
@@ -234,7 +224,7 @@ const ReviewForm = ({
                         )}
                     </Box>
 
-                    <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+                    <Box sx={{mt: 4, display: 'flex', justifyContent: 'space-between'}}>
                         <Button
                             variant="outlined"
                             color="secondary"
@@ -251,7 +241,7 @@ const ReviewForm = ({
                             disabled={isLoading}
                         >
                             {isLoading ? (
-                                <CircularProgress size={24} color="inherit" />
+                                <CircularProgress size={24} color="inherit"/>
                             ) : (
                                 submitButtonText
                             )}

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Container, Typography } from '@mui/material';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Container, Typography} from '@mui/material';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 import LoadingState from '../UI/LoadingState';
 import ReviewGrid from '../UI/ReviewGrid';
 
 const ContentReviewList = () => {
-    const { contentTitle } = useParams();
+    const {contentTitle} = useParams();
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -21,7 +21,8 @@ const ContentReviewList = () => {
                     headers: {
                         'Accept': 'application/json'
                     }
-                }); const data = await response.json();
+                });
+                const data = await response.json();
 
                 if (!response.ok) {
                     throw new Error(data.error || 'Failed to fetch reviews');
@@ -56,7 +57,7 @@ const ContentReviewList = () => {
             />
 
             {!loading && !error && !isEmpty && (
-                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Typography variant="h4" component="h1" gutterBottom>
                         Reviews for "{contentTitle}"
                     </Typography>

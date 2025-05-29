@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 import ReviewForm from '../UI/ReviewForm';
 
 const EditReview = () => {
-    const { reviewId } = useParams();
+    const {reviewId} = useParams();
     const navigate = useNavigate();
     const [initialValues, setInitialValues] = useState({
         contentType: '',
@@ -88,7 +88,7 @@ const EditReview = () => {
     };
 
     if (loading) {
-        return <ReviewForm isLoading={true} />;
+        return <ReviewForm isLoading={true}/>;
     }
 
     return (

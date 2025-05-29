@@ -76,43 +76,71 @@ const ReviewLogs = () => {
 
     if (error) {
         return <Alert severity="error">{error}</Alert>;
-    }    return (
-        <Paper sx={{p: { xs: 1, sm: 2, md: 3 }, width: '100%', overflow: 'hidden' }}>
-            <Typography variant="h6" component="h2" gutterBottom sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>
+    }
+    return (
+        <Paper sx={{p: {xs: 1, sm: 2, md: 3}, width: '100%', overflow: 'hidden'}}>
+            <Typography variant="h6" component="h2" gutterBottom sx={{fontSize: {xs: '1.1rem', sm: '1.25rem'}}}>
                 Review Activity Logs
             </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{mb: { xs: 1, sm: 2, md: 3 }}}>
+            <Typography variant="body2" color="text.secondary" sx={{mb: {xs: 1, sm: 2, md: 3}}}>
                 Monitor review creation, updates, and deletion activities
             </Typography>
-            
+
             {logs.length === 0 ? (
                 <Alert severity="info">No review logs found.</Alert>
             ) : (
-                <Box sx={{ maxHeight: { xs: '350px', sm: '450px' }, overflow: 'auto', WebkitOverflowScrolling: 'touch' }}>
-                    <TableContainer sx={{ overflow: 'auto' }}>
-                        <Table sx={{ minWidth: { xs: 300, sm: 650 } }}>
+                <Box sx={{maxHeight: {xs: '350px', sm: '450px'}, overflow: 'auto', WebkitOverflowScrolling: 'touch'}}>
+                    <TableContainer sx={{overflow: 'auto'}}>
+                        <Table sx={{minWidth: {xs: 300, sm: 650}}}>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' }, position: 'sticky', top: 0, backgroundColor: 'background.paper', zIndex: 1 }}><strong>Log ID</strong></TableCell>
-                                    <TableCell sx={{ position: 'sticky', top: 0, backgroundColor: 'background.paper', zIndex: 1 }}><strong>Review ID</strong></TableCell>
-                                    <TableCell sx={{ position: 'sticky', top: 0, backgroundColor: 'background.paper', zIndex: 1 }}><strong>Operation</strong></TableCell>
-                                    <TableCell sx={{ position: 'sticky', top: 0, backgroundColor: 'background.paper', zIndex: 1 }}><strong>Date & Time</strong></TableCell>
+                                    <TableCell sx={{
+                                        display: {xs: 'none', sm: 'table-cell'},
+                                        position: 'sticky',
+                                        top: 0,
+                                        backgroundColor: 'background.paper',
+                                        zIndex: 1
+                                    }}><strong>Log ID</strong></TableCell>
+                                    <TableCell sx={{
+                                        position: 'sticky',
+                                        top: 0,
+                                        backgroundColor: 'background.paper',
+                                        zIndex: 1
+                                    }}><strong>Review ID</strong></TableCell>
+                                    <TableCell sx={{
+                                        position: 'sticky',
+                                        top: 0,
+                                        backgroundColor: 'background.paper',
+                                        zIndex: 1
+                                    }}><strong>Operation</strong></TableCell>
+                                    <TableCell sx={{
+                                        position: 'sticky',
+                                        top: 0,
+                                        backgroundColor: 'background.paper',
+                                        zIndex: 1
+                                    }}><strong>Date & Time</strong></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {logs.map((log) => (
                                     <TableRow key={log.logID} hover>
-                                        <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{log.logID}</TableCell>
+                                        <TableCell
+                                            sx={{display: {xs: 'none', sm: 'table-cell'}}}>{log.logID}</TableCell>
                                         <TableCell>{log.reviewID}</TableCell>
                                         <TableCell>
                                             <Chip
                                                 label={log.operation}
                                                 color={getOperationColor(log.operation)}
                                                 size="small"
-                                                sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                                                sx={{fontSize: {xs: '0.7rem', sm: '0.75rem'}}}
                                             />
                                         </TableCell>
-                                        <TableCell sx={{ fontSize: { xs: '0.7rem', sm: 'inherit' } }}>{formatDate(log.date)}</TableCell>
+                                        <TableCell sx={{
+                                            fontSize: {
+                                                xs: '0.7rem',
+                                                sm: 'inherit'
+                                            }
+                                        }}>{formatDate(log.date)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

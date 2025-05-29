@@ -1,0 +1,147 @@
+.favorite-reviews-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.favorite-reviews-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.favorite-reviews-header h1 {
+    color: #333;
+    margin-bottom: 0.5rem;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.favorite-count {
+    color: #666;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.favorite-reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.no-favorites {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #f9f9f9;
+    border-radius: 12px;
+    border: 2px dashed #ddd;
+}
+
+.no-favorites-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.no-favorites h3 {
+    color: #333;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.no-favorites p {
+    color: #666;
+    font-size: 1rem;
+    max-width: 400px;
+    margin: 0 auto;
+    line-height: 1.5;
+}
+
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: #fee;
+    border: 1px solid #fcc;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.error-message p {
+    color: #c33;
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .favorite-reviews-header h1 {
+        color: #fff;
+    }
+
+    .favorite-count {
+        color: #ccc;
+    }
+
+    .no-favorites {
+        background-color: #2a2a2a;
+        border-color: #555;
+    }
+
+    .no-favorites h3 {
+        color: #fff;
+    }
+
+    .no-favorites p {
+        color: #ccc;
+    }
+
+    .error-message {
+        background-color: #3a1a1a;
+        border-color: #5a2a2a;
+    }
+
+    .error-message p {
+        color: #ff6b6b;
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .favorite-reviews-container {
+        padding: 1rem;
+    }
+
+    .favorite-reviews-header h1 {
+        font-size: 2rem;
+    }
+
+    .favorite-reviews-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .no-favorites {
+        padding: 2rem 1rem;
+    }
+
+    .no-favorites-icon {
+        font-size: 3rem;
+    }
+
+    .no-favorites h3 {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .favorite-reviews-header h1 {
+        font-size: 1.75rem;
+    }
+
+    .favorite-count {
+        font-size: 1rem;
+    }
+
+    .no-favorites-icon {
+        font-size: 2.5rem;
+    }
+}

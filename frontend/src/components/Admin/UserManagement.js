@@ -140,42 +140,44 @@ const UserManagement = () => {
             console.error('Error updating user role:', err);
             setError(err.message);
         }
-    };    if (loading) {
+    };
+    if (loading) {
         return (
             <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                <CircularProgress />
+                <CircularProgress/>
             </Box>
         );
     }
 
     if (error) {
         return (
-            <Alert 
-                severity="error" 
+            <Alert
+                severity="error"
                 sx={{
-                    fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                    py: { xs: 0.5, sm: 1 }
+                    fontSize: {xs: '0.8rem', sm: '0.875rem'},
+                    py: {xs: 0.5, sm: 1}
                 }}
             >
                 {error}
             </Alert>
         );
-    }    return (
+    }
+    return (
         <>
-            <Typography variant="h6" component="h2" gutterBottom sx={{ 
-                fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                display: { sm: 'none' }
+            <Typography variant="h6" component="h2" gutterBottom sx={{
+                fontSize: {xs: '1.1rem', sm: '1.25rem'},
+                display: {sm: 'none'}
             }}>
                 User Management
             </Typography>
-            
+
             {error && (
-                <Alert 
-                    severity="error" 
+                <Alert
+                    severity="error"
                     sx={{
-                        mb: { xs: 1, sm: 2 },
-                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                        py: { xs: 0.5, sm: 1 }
+                        mb: {xs: 1, sm: 2},
+                        fontSize: {xs: '0.8rem', sm: '0.875rem'},
+                        py: {xs: 0.5, sm: 1}
                     }}
                 >
                     {error}
@@ -183,104 +185,108 @@ const UserManagement = () => {
             )}
 
             {deleteSuccess && (
-                <Alert 
-                    severity="success" 
+                <Alert
+                    severity="success"
                     sx={{
-                        mb: { xs: 1, sm: 2 },
-                        fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                        py: { xs: 0.5, sm: 1 }
+                        mb: {xs: 1, sm: 2},
+                        fontSize: {xs: '0.8rem', sm: '0.875rem'},
+                        py: {xs: 0.5, sm: 1}
                     }}
                 >
                     {deleteSuccess.message} ({deleteSuccess.reviewsDeleted} reviews deleted)
                 </Alert>
-            )}<TableContainer component={Paper} sx={{ overflow: 'auto' }}>
-                <Table sx={{ minWidth: { xs: 300, sm: 650 } }}>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>ID</TableCell>
-                            <TableCell>Username</TableCell>
-                            <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>Email</TableCell>
-                            <TableCell>Role</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {users.map((user) => (
-                            <TableRow key={user.id}>
-                                <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>{user.id}</TableCell>
-                                <TableCell>{user.username}</TableCell>
-                                <TableCell sx={{ display: { xs: 'none', md: 'table-cell' } }}>{user.email}</TableCell>
-                                <TableCell>{user.role}</TableCell>
-                                <TableCell>
-                                    <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: { xs: 1, sm: 1 } }}>
+            )}<TableContainer component={Paper} sx={{overflow: 'auto'}}>
+            <Table sx={{minWidth: {xs: 300, sm: 650}}}>
+                <TableHead>
+                    <TableRow>
+                        <TableCell sx={{display: {xs: 'none', sm: 'table-cell'}}}>ID</TableCell>
+                        <TableCell>Username</TableCell>
+                        <TableCell sx={{display: {xs: 'none', md: 'table-cell'}}}>Email</TableCell>
+                        <TableCell>Role</TableCell>
+                        <TableCell>Actions</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {users.map((user) => (
+                        <TableRow key={user.id}>
+                            <TableCell sx={{display: {xs: 'none', sm: 'table-cell'}}}>{user.id}</TableCell>
+                            <TableCell>{user.username}</TableCell>
+                            <TableCell sx={{display: {xs: 'none', md: 'table-cell'}}}>{user.email}</TableCell>
+                            <TableCell>{user.role}</TableCell>
+                            <TableCell>
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: {xs: 'column', sm: 'row'},
+                                    gap: {xs: 1, sm: 1}
+                                }}>
+                                    <Button
+                                        variant="contained"
+                                        size="small"
+                                        onClick={() => handleRoleChange(user)}
+                                        sx={{minWidth: {xs: '100%', sm: 'auto'}}}
+                                    >
+                                        Change Role
+                                    </Button>
+                                    {user.role !== 'ROLE_ADMIN' && (
                                         <Button
                                             variant="contained"
                                             size="small"
-                                            onClick={() => handleRoleChange(user)}
-                                            sx={{ minWidth: { xs: '100%', sm: 'auto' } }}
+                                            color="error"
+                                            onClick={() => handleDeleteClick(user)}
+                                            sx={{minWidth: {xs: '100%', sm: 'auto'}}}
                                         >
-                                            Change Role
+                                            Delete
                                         </Button>
-                                        {user.role !== 'ROLE_ADMIN' && (
-                                            <Button
-                                                variant="contained"
-                                                size="small"
-                                                color="error"
-                                                onClick={() => handleDeleteClick(user)}
-                                                sx={{ minWidth: { xs: '100%', sm: 'auto' } }}
-                                            >
-                                                Delete
-                                            </Button>
-                                        )}
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>            <Dialog 
-                open={dialogOpen} 
-                onClose={() => setDialogOpen(false)}
-                fullScreen={window.innerWidth < 600}
-                PaperProps={{
-                    sx: { width: { xs: '100%', sm: '400px' }, m: { xs: 0, sm: 2 } }
-                }}
-            >
-                <DialogTitle sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>Change User Role</DialogTitle>
-                <DialogContent>
-                    <FormControl fullWidth sx={{mt: { xs: 1, sm: 2 }}}>
-                        <InputLabel>Role</InputLabel>
-                        <Select
-                            value={selectedRole}
-                            label="Role"
-                            onChange={(e) => setSelectedRole(e.target.value)}
-                        >
-                            <MenuItem value="ROLE_USER">User</MenuItem>
-                            <MenuItem value="ROLE_ADMIN">Admin</MenuItem>
-                        </Select>
-                    </FormControl>
-                </DialogContent>
-                <DialogActions sx={{ p: { xs: 2 } }}>
-                    <Button onClick={() => setDialogOpen(false)} size="small">Cancel</Button>
-                    <Button onClick={handleUpdateRole} color="primary" size="small">
-                        Update
-                    </Button>
-                </DialogActions>
-            </Dialog>
+                                    )}
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </TableContainer> <Dialog
+            open={dialogOpen}
+            onClose={() => setDialogOpen(false)}
+            fullScreen={window.innerWidth < 600}
+            PaperProps={{
+                sx: {width: {xs: '100%', sm: '400px'}, m: {xs: 0, sm: 2}}
+            }}
+        >
+            <DialogTitle sx={{fontSize: {xs: '1.1rem', sm: '1.25rem'}}}>Change User Role</DialogTitle>
+            <DialogContent>
+                <FormControl fullWidth sx={{mt: {xs: 1, sm: 2}}}>
+                    <InputLabel>Role</InputLabel>
+                    <Select
+                        value={selectedRole}
+                        label="Role"
+                        onChange={(e) => setSelectedRole(e.target.value)}
+                    >
+                        <MenuItem value="ROLE_USER">User</MenuItem>
+                        <MenuItem value="ROLE_ADMIN">Admin</MenuItem>
+                    </Select>
+                </FormControl>
+            </DialogContent>
+            <DialogActions sx={{p: {xs: 2}}}>
+                <Button onClick={() => setDialogOpen(false)} size="small">Cancel</Button>
+                <Button onClick={handleUpdateRole} color="primary" size="small">
+                    Update
+                </Button>
+            </DialogActions>
+        </Dialog>
 
-            <Dialog 
-                open={deleteDialogOpen} 
+            <Dialog
+                open={deleteDialogOpen}
                 onClose={() => setDeleteDialogOpen(false)}
                 fullScreen={window.innerWidth < 600}
                 PaperProps={{
-                    sx: { width: { xs: '100%', sm: '400px' }, m: { xs: 0, sm: 2 } }
+                    sx: {width: {xs: '100%', sm: '400px'}, m: {xs: 0, sm: 2}}
                 }}
             >
-                <DialogTitle sx={{ fontSize: { xs: '1.1rem', sm: '1.25rem' } }}>Confirm Delete User</DialogTitle>
-                <DialogContent sx={{ py: { xs: 2 } }}>
+                <DialogTitle sx={{fontSize: {xs: '1.1rem', sm: '1.25rem'}}}>Confirm Delete User</DialogTitle>
+                <DialogContent sx={{py: {xs: 2}}}>
                     Are you sure you want to delete user "{selectedUser?.username}"? This action cannot be undone.
                 </DialogContent>
-                <DialogActions sx={{ p: { xs: 2 } }}>
+                <DialogActions sx={{p: {xs: 2}}}>
                     <Button onClick={() => setDeleteDialogOpen(false)} size="small">Cancel</Button>
                     <Button onClick={handleDeleteConfirm} color="error" size="small">
                         Delete

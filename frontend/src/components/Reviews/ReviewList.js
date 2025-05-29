@@ -1,18 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import {
-    Container,
-    Typography
-} from '@mui/material';
-import { fetchWithSessionCheck } from '../../utils/sessionUtils';
+import React, {useEffect, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
+import {Container, Typography} from '@mui/material';
+import {fetchWithSessionCheck} from '../../utils/sessionUtils';
 import LoadingState from '../UI/LoadingState';
 import ContentFilter from '../UI/ContentFilter';
 import ReviewGrid from '../UI/ReviewGrid';
 
 const CONTENT_TYPES = ['All', 'movie', 'tvseries', 'game', 'book'];
 
-const ReviewList = ({ userId: propsUserId }) => {
-    const { userId: paramsUserId } = useParams();
+const ReviewList = ({userId: propsUserId}) => {
+    const {userId: paramsUserId} = useParams();
     const userId = paramsUserId || propsUserId;
     const [reviews, setReviews] = useState([]);
     const [filteredReviews, setFilteredReviews] = useState([]);
@@ -45,7 +42,8 @@ const ReviewList = ({ userId: propsUserId }) => {
                     headers: {
                         'Accept': 'application/json'
                     }
-                }); const data = await response.json();
+                });
+                const data = await response.json();
 
                 if (!response.ok) {
                     throw new Error(data.error || 'Failed to fetch reviews');
@@ -86,7 +84,8 @@ const ReviewList = ({ userId: propsUserId }) => {
 
     const handleReviewClick = (reviewId) => {
         navigate(`/review/${reviewId}`);
-    }; const isEmpty = reviews.length === 0;
+    };
+    const isEmpty = reviews.length === 0;
     const emptyMessage = "No reviews found. Create your first review!";
 
     return (
@@ -99,7 +98,7 @@ const ReviewList = ({ userId: propsUserId }) => {
             />
 
             {!loading && !error && !isEmpty && (
-                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
                     <Typography variant="h4" component="h1" gutterBottom>
                         {paramsUserId ? `${username}'s Reviews` : 'My Reviews'}
                     </Typography>

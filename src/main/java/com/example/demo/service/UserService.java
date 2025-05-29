@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,7 +19,6 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -29,9 +27,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final LogService logService;
+    private final UserFavoriteReviewService userFavoriteReviewService;
 
     public Authentication authenticateUser(String username, String password,
-            AuthenticationManager authenticationManager) {
+                                           AuthenticationManager authenticationManager) {
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 username, password));
     }
@@ -151,6 +150,8 @@ public class UserService {
                 throw new IllegalStateException("Cannot delete the last admin user");
             }
         }
+
+        userFavoriteReviewService.removeAllUserFavorites(userId);
 
         userRepository.delete(userToDelete);
 

@@ -25,12 +25,12 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ReviewService {
+    private static final String UPLOADS_DIR = "uploads";
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
     private final LogService logService;
     private final UserService userService;
-
-    private static final String UPLOADS_DIR = "uploads";
+    private final UserFavoriteReviewService userFavoriteReviewService;
 
     public List<Review> getReviewsByUserId(Integer userId) {
         return reviewRepository.findByUserID(userId);
@@ -54,7 +54,7 @@ public class ReviewService {
 
     @Transactional
     public Review createReview(String contentType, String contentTitle, String reviewTitle,
-            String reviewDescription, MultipartFile coverFile, Principal principal) throws IOException {
+                               String reviewDescription, MultipartFile coverFile, Principal principal) throws IOException {
         String username = principal.getName();
         Integer userId = userService.getUserIdByUsername(username);
 
@@ -74,7 +74,7 @@ public class ReviewService {
 
     @Transactional
     public Review updateReview(Integer reviewId, String contentType, String contentTitle, String reviewTitle,
-            String reviewDescription, MultipartFile coverFile, Principal principal) throws IOException {
+                               String reviewDescription, MultipartFile coverFile, Principal principal) throws IOException {
         String username = principal.getName();
         Integer userId = userService.getUserIdByUsername(username);
 
@@ -131,10 +131,11 @@ public class ReviewService {
         if (!review.getUserID().equals(userId) && !isAdmin) {
             throw new AccessDeniedException("You are not authorized to delete this review");
         }
-
         if (review.getCoverFile() != null) {
             deleteFile(review.getCoverFile());
         }
+
+        userFavoriteReviewService.removeAllFavoritesForReview(reviewId);
 
         reviewRepository.delete(review);
 
@@ -156,7 +157,7 @@ public class ReviewService {
         String originalFileName = file.getOriginalFilename();
         String fileExtension = originalFileName != null ? originalFileName.substring(originalFileName.lastIndexOf('.'))
                 : "";
-        String newFileName = UUID.randomUUID().toString() + fileExtension;
+        String newFileName = UUID.randomUUID() + fileExtension;
 
         Path filePath = Paths.get(UPLOADS_DIR, newFileName);
         Files.write(filePath, file.getBytes());

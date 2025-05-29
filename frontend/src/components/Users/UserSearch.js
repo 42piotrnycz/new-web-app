@@ -35,6 +35,7 @@ const UserSearch = () => {
         }, 300),
         []
     );
+
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
