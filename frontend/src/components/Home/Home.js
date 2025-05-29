@@ -1,24 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { fetchWithSessionCheck } from '../../services/auth';
-import {
-    Container,
-    Typography,
-    Card,
-    CardContent,
-    CardMedia,
-    Grid,
-    CircularProgress,
-    Alert,
-    Box,
-    Button,
-    ToggleButton,
-    ToggleButtonGroup
-} from '@mui/material';
-
-const CARD_HEIGHT = 500;
-const CARD_WIDTH = 345;
-const IMAGE_HEIGHT = 200;
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import {fetchWithSessionCheck} from '../../services/auth';
+import {Container, Typography} from '@mui/material';
+import LoadingState from '../UI/LoadingState';
+import ContentFilter from '../UI/ContentFilter';
+import ReviewGrid from '../UI/ReviewGrid';
 
 const CONTENT_TYPES = ['All', 'movie', 'tvseries', 'game', 'book'];
 
@@ -29,7 +15,8 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [reviewUsernames, setReviewUsernames] = useState({});
     const [selectedType, setSelectedType] = useState('All');
-    const navigate = useNavigate(); useEffect(() => {
+    const navigate = useNavigate();
+    useEffect(() => {
         const fetchLatestReviews = async () => {
             try {
                 const response = await fetchWithSessionCheck('/api/reviews/latest', {
@@ -37,17 +24,15 @@ const Home = () => {
                         'Accept': 'application/json'
                     }
                 });
+                const data = await response.json();
 
                 if (!response.ok) {
-                    const data = await response.json();
                     throw new Error(data.error || 'Failed to fetch reviews');
                 }
 
-                const data = await response.json();
                 setReviews(data);
-                setFilteredReviews(data); // Initialize filtered reviews with all reviews
+                setFilteredReviews(data);
 
-                // Fetch usernames for all reviews
                 const usernamePromises = data.map(review =>
                     fetchWithSessionCheck(`/api/users/${review.userID}`, {
                         headers: {
@@ -94,200 +79,38 @@ const Home = () => {
     const handleReviewClick = (reviewId) => {
         navigate(`/review/${reviewId}`);
     };
-
-    if (loading) {
-        return (
-            <Container sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
-            </Container>
-        );
-    }
-
-    if (error) {
-        return (
-            <Container sx={{ mt: 4 }}>
-                <Alert severity="error">{error}</Alert>
-            </Container>
-        );
-    }
-
     return (
-        <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-                Welcome to REviewer 2.0
-            </Typography>
-            <Typography variant="h5" component="h2" gutterBottom sx={{ mb: 3 }}>
-                Latest Reviews
-            </Typography>
+        <>
+            <LoadingState
+                loading={loading}
+                error={error}
+            />
 
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-                <ToggleButtonGroup
-                    value={selectedType}
-                    exclusive
-                    onChange={handleTypeChange}
-                    aria-label="content type"
-                    color="primary"
-                    sx={{
-                        '& .MuiToggleButton-root': {
-                            textTransform: 'none',
-                            px: 3
-                        }
-                    }}
-                >
-                    {CONTENT_TYPES.map((type) => (
-                        <ToggleButton
-                            key={type}
-                            value={type}
-                        >
-                            {type}
-                        </ToggleButton>
-                    ))}
-                </ToggleButtonGroup>
-            </Box>
+            {!loading && !error && (
+                <Container maxWidth="lg" sx={{mt: 4, mb: 4}}>
+                    <Typography variant="h4" component="h1" gutterBottom align="center" sx={{mb: 4}}>
+                        Welcome to REviewer 2.0
+                    </Typography>
+                    <Typography variant="h5" component="h2" gutterBottom sx={{mb: 3}}>
+                        Latest Reviews
+                    </Typography>
 
-            <Grid container spacing={3} sx={{ display: 'flex', justifyContent: 'flex-start' }}>
-                {filteredReviews.length === 0 ? (
-                    <Box sx={{ width: '100%', mt: 2, display: 'flex', justifyContent: 'center' }}>
-                        <Alert severity="info">No reviews found for this category.</Alert>
-                    </Box>
-                ) : (
-                    filteredReviews.map(review => (
-                        <Grid item key={review.reviewID} sx={{ width: CARD_WIDTH, m: 1 }}>
-                            <Card
-                                sx={{
-                                    width: CARD_WIDTH,
-                                    height: CARD_HEIGHT,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    cursor: 'pointer',
-                                    '&:hover': {
-                                        boxShadow: 6,
-                                        transform: 'scale(1.02)',
-                                        transition: 'all 0.2s ease-in-out'
-                                    }
-                                }}
-                                onClick={() => handleReviewClick(review.reviewID)}
-                            >
-                                <CardContent sx={{ p: 2, pb: 0, flex: '0 0 auto' }}>
-                                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                                        <Typography
-                                            variant="body2"
-                                            color="text.secondary"
-                                            sx={{
-                                                textTransform: 'uppercase',
-                                                height: 24
-                                            }}
-                                        >
-                                            {review.contentType}
-                                        </Typography>
-                                        <Typography
-                                            variant="body2"
-                                            color="text.secondary"
-                                            component={Button}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate(`/user/${review.userID}/reviews`);
-                                            }}
-                                            sx={{
-                                                textTransform: 'none',
-                                                p: 0,
-                                                minWidth: 'auto',
-                                                '&:hover': {
-                                                    background: 'none',
-                                                    textDecoration: 'underline'
-                                                }
-                                            }}
-                                        >
-                                            by {reviewUsernames[review.userID] || '...'}
-                                        </Typography>
-                                    </Box>
-                                    <Typography
-                                        variant="h6"
-                                        component="h2"
-                                        sx={{
-                                            mb: 1,
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 2,
-                                            WebkitBoxOrient: 'vertical',
-                                            lineHeight: 1.2,
-                                            height: 48
-                                        }}
-                                    >
-                                        {review.contentTitle}
-                                    </Typography>
-                                </CardContent>
+                    <ContentFilter
+                        selectedType={selectedType}
+                        onTypeChange={handleTypeChange}
+                        contentTypes={CONTENT_TYPES}
+                    />
 
-                                <Box sx={{ width: '100%', height: IMAGE_HEIGHT, position: 'relative' }}>
-                                    {review.coverFile ? (
-                                        <CardMedia
-                                            component="img"
-                                            sx={{
-                                                height: '100%',
-                                                width: '100%',
-                                                objectFit: 'cover'
-                                            }}
-                                            image={`/uploads/${review.coverFile}`}
-                                            alt={review.contentTitle}
-                                        />
-                                    ) : (
-                                        <Box
-                                            sx={{
-                                                height: '100%',
-                                                width: '100%',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                bgcolor: 'grey.200',
-                                                color: 'text.secondary'
-                                            }}
-                                        >
-                                            <Typography>No image available</Typography>
-                                        </Box>
-                                    )}
-                                </Box>
-
-                                <CardContent sx={{ p: 2, pt: 1, flex: '1 0 auto' }}>
-                                    {review.reviewTitle && (
-                                        <Typography
-                                            variant="h6"
-                                            component="h3"
-                                            sx={{
-                                                mb: 1,
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                display: '-webkit-box',
-                                                WebkitLineClamp: 1,
-                                                WebkitBoxOrient: 'vertical',
-                                                lineHeight: 1.2,
-                                                height: 24
-                                            }}
-                                        >
-                                            {review.reviewTitle}
-                                        </Typography>
-                                    )}
-                                    <Typography
-                                        variant="body1"
-                                        color="text.primary"
-                                        sx={{
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            display: '-webkit-box',
-                                            WebkitLineClamp: 4,
-                                            WebkitBoxOrient: 'vertical',
-                                            height: 96
-                                        }}
-                                    >
-                                        {review.reviewDescription}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))
-                )}
-            </Grid>
-        </Container>
+                    <ReviewGrid
+                        reviews={filteredReviews}
+                        onReviewClick={handleReviewClick}
+                        onUserClick={(userId) => navigate(`/user/${userId}/reviews`)}
+                        usernames={reviewUsernames}
+                        showUsernames={true}
+                        noResultsMessage="No reviews found for this category."
+                    /> </Container>
+            )}
+        </>
     );
 };
 

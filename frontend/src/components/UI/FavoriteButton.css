@@ -1,0 +1,85 @@
+.favorite-button-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.favorite-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.favorite-button:hover {
+    transform: scale(1.1);
+    background-color: rgba(255, 182, 193, 0.2);
+}
+
+.favorite-button:active {
+    transform: scale(0.95);
+}
+
+.favorite-button.loading {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.favorite-button.favorited {
+    animation: heartBeat 0.3s ease-in-out;
+}
+
+.heart-icon {
+    font-size: 1.2rem;
+    transition: all 0.2s ease;
+}
+
+.favorite-button:hover .heart-icon {
+    transform: scale(1.1);
+}
+
+.favorite-count {
+    font-size: 0.875rem;
+    color: #666;
+    font-weight: 500;
+    min-width: 1rem;
+    text-align: center;
+}
+
+@keyframes heartBeat {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .favorite-count {
+        color: #ccc;
+    }
+
+    .favorite-button:hover {
+        background-color: rgba(255, 182, 193, 0.1);
+    }
+}
+
+@media (max-width: 768px) {
+    .heart-icon {
+        font-size: 1rem;
+    }
+
+    .favorite-count {
+        font-size: 0.75rem;
+    }
+}

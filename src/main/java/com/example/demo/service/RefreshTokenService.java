@@ -25,21 +25,17 @@ public class RefreshTokenService {
     @Value("${app.refresh-token.expiration-days:7}")
     private int refreshTokenExpirationDays;
 
-    /**
-     * Create a new refresh token for a user
-     */
     @Transactional
     public String createRefreshToken(User user) {
-        // Revoke any existing tokens for this user
         revokeAllUserTokens(user);
 
-        // Create new refresh token
         String tokenValue = UUID.randomUUID().toString();
         LocalDateTime expiryDate = LocalDateTime.now().plusDays(refreshTokenExpirationDays);
         RefreshToken refreshToken = RefreshToken.builder()
                 .token(tokenValue)
                 .user(user)
                 .expiryDate(expiryDate)
+                .revoke(false)
                 .build();
 
         refreshTokenRepository.save(refreshToken);
@@ -48,43 +44,32 @@ public class RefreshTokenService {
         return tokenValue;
     }
 
-    /**
-     * Validate a refresh token
-     */
     public Optional<RefreshToken> validateRefreshToken(String token) {
-        return refreshTokenRepository.findByTokenAndRevokedFalse(token)
+        return refreshTokenRepository.findByTokenAndRevokeFalse(token)
                 .filter(refreshToken -> refreshToken.getExpiryDate().isAfter(LocalDateTime.now()));
     }
 
-    /**
-     * Revoke a specific refresh token
-     */
     @Transactional
     public void revokeRefreshToken(String token) {
-        refreshTokenRepository.findByTokenAndRevokedFalse(token)
+        refreshTokenRepository.findByTokenAndRevokeFalse(token)
                 .ifPresent(refreshToken -> {
-                    refreshToken.setRevoked(true);
+                    refreshToken.setRevoke(true);
                     refreshTokenRepository.save(refreshToken);
                     log.debug("Revoked refresh token: {}", token);
                 });
     }
 
-    /**
-     * Revoke all refresh tokens for a user
-     */
     @Transactional
     public void revokeAllUserTokens(User user) {
-        refreshTokenRepository.findByUserAndRevokedFalse(user)
+        refreshTokenRepository.findByUserAndRevokeFalse(user)
                 .forEach(token -> {
-                    token.setRevoked(true);
+                    token.setRevoke(true);
                     refreshTokenRepository.save(token);
                 });
         log.debug("Revoked all refresh tokens for user: {}", user.getUsername());
     }
 
-    /**
-     * Clean up expired tokens
-     */
+
     @Transactional
     public void cleanupExpiredTokens() {
         LocalDateTime now = LocalDateTime.now();
@@ -94,18 +79,12 @@ public class RefreshTokenService {
         }
     }
 
-    /**
-     * Check if user has any valid refresh tokens
-     */
     public boolean hasValidRefreshToken(User user) {
-        return refreshTokenRepository.findByUserAndRevokedFalse(user)
+        return refreshTokenRepository.findByUserAndRevokeFalse(user)
                 .stream()
                 .anyMatch(token -> token.getExpiryDate().isAfter(LocalDateTime.now()));
     }
 
-    /**
-     * Check if user has any valid refresh tokens by username
-     */
     public boolean hasValidRefreshToken(String username) {
         return userRepository.findByUsername(username)
                 .map(this::hasValidRefreshToken)

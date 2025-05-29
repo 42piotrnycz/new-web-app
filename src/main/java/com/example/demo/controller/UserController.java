@@ -1,11 +1,12 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequiredArgsConstructor
@@ -19,11 +20,11 @@ public class UserController {
 
     @PostMapping("/register")
     public String processRegistration(@RequestParam String username,
-                                    @RequestParam String password,
-                                    @RequestParam String email,
-                                    Model model) {
+                                      @RequestParam String password,
+                                      @RequestParam String email,
+                                      Model model) {
         if (!userService.registerUser(username, password, email)) {
-            model.addAttribute("error", "Użytkownik o podanym loginie już istnieje.");
+            model.addAttribute("error", "User with that username already exists.");
             return "register";
         }
         return "redirect:/login";
@@ -35,7 +36,7 @@ public class UserController {
     }
 
     @GetMapping("/profile")
-    public String profilePage(@RequestParam Long id, Model model) {
+    public String profilePage(@RequestParam Integer id, Model model) {
         return userService.findById(id)
                 .map(user -> {
                     model.addAttribute("user", user);
