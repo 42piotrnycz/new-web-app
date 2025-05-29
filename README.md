@@ -114,7 +114,7 @@ The API provides standardized error responses with appropriate HTTP status codes
 
 Each error response includes a descriptive message to help diagnose the issue.
 
-![ERD Diagram](https://github.com/42piotrnycz/new-web-app/blob/feat(%236)-final-fixes/src/main/resources/static/postgres.png)
+![ERD Diagram](https://github.com/42piotrnycz/new-web-app/blob/feat(%236)-final-fixes/postgres.png)
 
 ## SQL CLONE CODE:
 
