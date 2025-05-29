@@ -3,6 +3,7 @@
 **REviewer 2.0** is your personal web application for creating, managing, and sharing reviews for various types of content. 
 The platform allows users to share their opinions on movies, books, games, and tv series - and to create their personal journal by doing so.
 
+
 ###  Key Features
 - **User Authentication:** Secure registration and login system with JWT-based authorization
 - **Review Management:** Create, read, update, and delete reviews with media attachments
