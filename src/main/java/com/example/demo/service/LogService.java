@@ -8,9 +8,12 @@ import com.example.demo.repository.ReviewLogRepository;
 import com.example.demo.repository.UserLogRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -62,5 +65,20 @@ public class LogService {
             log.warn("Could not determine next review log ID, using timestamp-based ID", e);
             return (int) (System.currentTimeMillis() % Integer.MAX_VALUE);
         }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<UserLog> getAllUserLogs() {
+        return userLogRepository.findAllOrderByDateDesc();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<ReviewLog> getAllReviewLogs() {
+        return reviewLogRepository.findAllOrderByDateDesc();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<AdminLog> getAllAdminLogs() {
+        return adminLogRepository.findAllOrderByDateDesc();
     }
 }

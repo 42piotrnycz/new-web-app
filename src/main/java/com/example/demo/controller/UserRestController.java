@@ -2,8 +2,6 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Review;
 import com.example.demo.model.User;
-import com.example.demo.repository.ReviewRepository;
-import com.example.demo.repository.UserRepository;
 import com.example.demo.security.JwtUtil;
 import com.example.demo.service.LogService;
 import com.example.demo.service.RefreshTokenService;
@@ -27,7 +25,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,16 +42,13 @@ import java.util.stream.Collectors;
 @CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "User Management", description = "APIs for user authentication, registration, and management")
 public class UserRestController {
-    private final UserRepository userRepository;
-    private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final JwtUtil jwtUtil;
     private final AuthenticationManager authenticationManager;
-    private final LogService logService;
     private final RefreshTokenService refreshTokenService;
 
     @Operation(summary = "User Login", description = "Authenticate user with username and password. Returns JWT token for subsequent API calls.", tags = {
-            "Authentication"})
+            "Authentication" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Map.class), examples = @ExampleObject(value = """
                     {
@@ -79,24 +73,23 @@ public class UserRestController {
             if (credentials.get("username") == null || credentials.get("password") == null) {
                 return ResponseEntity.badRequest().body(Map.of("error", "Username and password are required"));
             }
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            credentials.get("username"),
-                            credentials.get("password")));
-            String token = jwtUtil.generateToken(credentials.get("username"),
+
+            String usernameValue = credentials.get("username");
+            String passwordValue = credentials.get("password");
+
+            Authentication authentication = userService.authenticateUser(usernameValue, passwordValue,
+                    authenticationManager);
+            String token = jwtUtil.generateToken(usernameValue,
                     authentication.getAuthorities().iterator().next().getAuthority());
 
-            Integer userId = userService.getUserIdByUsername(credentials.get("username"));
-
-            User user = userRepository.findByUsername(credentials.get("username"))
+            Integer userId = userService.getUserIdByUsername(usernameValue);
+            User user = userService.getUserByUsername(usernameValue)
                     .orElseThrow(() -> new RuntimeException("User not found after authentication"));
 
-            log.info("Login successful for user: {}", credentials.get("username"));
+            log.info("Login successful for user: {}", usernameValue);
 
             String role = user.getRole().name();
-
             String refreshTokenValue = refreshTokenService.createRefreshToken(user);
-            log.info("Created refresh token for user: {}", credentials.get("username"));
 
             ResponseCookie jwtCookie = ResponseCookie.from("jwt", token)
                     .httpOnly(true)
@@ -116,7 +109,7 @@ public class UserRestController {
 
             Map<String, Object> responseMap = new HashMap<>();
             responseMap.put("userId", userId);
-            responseMap.put("username", credentials.get("username"));
+            responseMap.put("username", usernameValue);
             responseMap.put("role", role);
 
             return ResponseEntity.ok()
@@ -133,7 +126,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "User Registration", description = "Register a new user account with username, password, and email.", tags = {
-            "Authentication"})
+            "Authentication" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Registration successful", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -183,7 +176,7 @@ public class UserRestController {
     })
     @GetMapping("/me")
     public ResponseEntity<?> getCurrentUser(Principal principal) {
-        return userRepository.findByUsername(principal.getName())
+        return userService.getUserByUsername(principal.getName())
                 .map(user -> {
                     Map<String, Object> userMap = new HashMap<>();
                     userMap.put("id", user.getId());
@@ -196,7 +189,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Get User by ID", description = "Retrieve user details by their unique identifier.", tags = {
-            "User Management"})
+            "User Management" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User found successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -210,7 +203,7 @@ public class UserRestController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(
             @Parameter(description = "User ID", required = true, example = "1") @PathVariable Long id) {
-        return userRepository.findById(id)
+        return userService.findById(id)
                 .map(user -> ResponseEntity.ok().body(Map.of(
                         "id", user.getId(),
                         "username", user.getUsername(),
@@ -219,7 +212,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Get All Users", description = "Retrieve a list of all users in the system. Requires admin privileges.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Admin"})
+            "Admin" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Users retrieved successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -242,7 +235,7 @@ public class UserRestController {
     @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllUsers() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userService.getAllUsers();
         List<Map<String, Object>> response = users.stream()
                 .map(user -> {
                     Map<String, Object> userMap = new HashMap<>();
@@ -257,7 +250,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Update User Role", description = "Update the role of a specific user. Requires admin privileges.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Admin"})
+            "Admin" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Role updated successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -281,31 +274,27 @@ public class UserRestController {
             @Parameter(description = "User ID", required = true, example = "1") @PathVariable Long id,
             @Parameter(description = "Role update request", required = true, example = "{\"role\": \"ROLE_ADMIN\"}") @RequestBody Map<String, String> request,
             Principal principal) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    String newRole = request.get("role");
-                    try {
-                        User.Role role = User.Role.valueOf(newRole);
-                        user.setRole(role);
-                        userRepository.save(user);
+        try {
+            String newRole = request.get("role");
+            User updatedUser = userService.updateUserRole(id.intValue(), newRole, principal);
 
-                        Integer adminId = userService.getUserIdByUsername(principal.getName());
-                        logService.logAdminActivity(adminId, "CHANGED ROLE OF USER (ID: " + id + ")");
-
-                        return ResponseEntity.ok(Map.of(
-                                "message", "Role updated successfully",
-                                "id", user.getId(),
-                                "username", user.getUsername(),
-                                "role", user.getRole().name()));
-                    } catch (IllegalArgumentException e) {
-                        return ResponseEntity.badRequest().body(Map.of("error", "Invalid role"));
-                    }
-                })
-                .orElse(ResponseEntity.notFound().build());
+            return ResponseEntity.ok(Map.of(
+                    "message", "Role updated successfully",
+                    "id", updatedUser.getId(),
+                    "username", updatedUser.getUsername(),
+                    "role", updatedUser.getRole().name()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            if (e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @Operation(summary = "Search Users", description = "Search for users by username using case-insensitive partial matching.", tags = {
-            "User Management"})
+            "User Management" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Search completed successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     [
@@ -323,7 +312,7 @@ public class UserRestController {
     @GetMapping("/search")
     public ResponseEntity<?> searchUsers(
             @Parameter(description = "Username search term", required = true, example = "doe") @RequestParam String username) {
-        List<User> users = userRepository.findByUsernameContainingIgnoreCase(username);
+        List<User> users = userService.searchUsers(username);
         List<Map<String, Object>> response = users.stream()
                 .map(user -> {
                     Map<String, Object> userMap = new HashMap<>();
@@ -337,12 +326,11 @@ public class UserRestController {
     }
 
     @Operation(summary = "Delete User", description = "Delete a user and all their reviews. Admin users cannot be deleted. Requires admin privileges.", security = @SecurityRequirement(name = "bearerAuth"), tags = {
-            "Admin"})
+            "Admin" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User deleted successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
-                        "message": "User and all their reviews deleted successfully",
-                        "reviewsDeleted": 5
+                        "message": "User and all their reviews deleted successfully"
                     }
                     """))),
             @ApiResponse(responseCode = "400", description = "Cannot delete admin users", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
@@ -363,42 +351,22 @@ public class UserRestController {
     public ResponseEntity<?> deleteUser(
             @Parameter(description = "User ID to delete", required = true, example = "1") @PathVariable Long id,
             Principal principal) {
-        return userRepository.findById(id)
-                .map(user -> {
-                    if (user.getRole() == User.Role.ROLE_ADMIN) {
-                        return ResponseEntity.badRequest().body(Map.of("error", "Cannot delete admin users"));
-                    }
-                    try {
-                        List<Review> userReviews = reviewRepository.findByUserID(user.getId());
-
-                        for (Review review : userReviews) {
-                            if (review.getCoverFile() != null && !review.getCoverFile().isEmpty()) {
-                                File coverFile = new File("uploads", review.getCoverFile());
-                                if (coverFile.exists()) {
-                                    coverFile.delete();
-                                }
-                            }
-                        }
-
-                        reviewRepository.deleteAll(userReviews);
-                        userRepository.delete(user);
-
-                        Integer adminId = userService.getUserIdByUsername(principal.getName());
-                        logService.logAdminActivity(adminId, "DELETED USER (ID: " + id + ")");
-
-                        return ResponseEntity.ok(Map.of(
-                                "message", "User and all their reviews deleted successfully",
-                                "reviewsDeleted", userReviews.size()));
-                    } catch (Exception e) {
-                        return ResponseEntity.internalServerError()
-                                .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
-                    }
-                })
-                .orElse(ResponseEntity.notFound().build());
+        try {
+            userService.deleteUser(id.intValue(), principal);
+            return ResponseEntity.ok(Map.of("message", "User and all their reviews deleted successfully"));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().contains("not found")) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Failed to delete user: " + e.getMessage()));
+        }
     }
 
     @Operation(summary = "User Logout", description = "Logout user by clearing the JWT cookie.", tags = {
-            "Authentication"})
+            "Authentication" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Logout successful", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -409,14 +377,7 @@ public class UserRestController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, Principal principal) {
         try {
-            if (principal != null) {
-                User user = userRepository.findByUsername(principal.getName())
-                        .orElse(null);
-                if (user != null) {
-                    refreshTokenService.revokeAllUserTokens(user);
-                    log.info("Revoked refresh tokens for user: {}", principal.getName());
-                }
-            }
+            userService.logoutUser(principal, refreshTokenService, log);
         } catch (Exception e) {
             log.warn("Error revoking refresh tokens during logout", e);
         }
@@ -444,7 +405,7 @@ public class UserRestController {
     }
 
     @Operation(summary = "Refresh JWT Token", description = "Use refresh token to get a new JWT token.", tags = {
-            "Authentication"})
+            "Authentication" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Token refreshed successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
                     {
@@ -474,18 +435,18 @@ public class UserRestController {
                 return ResponseEntity.status(401).body(Map.of("error", "Refresh token not found"));
             }
 
-            var refreshTokenOpt = refreshTokenService.validateRefreshToken(refreshToken);
-            if (refreshTokenOpt.isEmpty()) {
+            var refreshTokenResult = refreshTokenService.validateRefreshToken(refreshToken);
+            if (refreshTokenResult.isEmpty()) {
                 return ResponseEntity.status(401).body(Map.of("error", "Invalid or expired refresh token"));
             }
 
-            var refreshTokenEntity = refreshTokenOpt.get();
-            var user = refreshTokenEntity.getUser();
+            var user = refreshTokenResult.get().getUser();
+            String newToken = jwtUtil.generateToken(user.getUsername(), user.getRole().toString());
 
-            String newJwtToken = jwtUtil.generateToken(user.getUsername(), user.getRole().name());
-            log.info("Generated new JWT for user: {}", user.getUsername());
+            refreshTokenService.revokeRefreshToken(refreshToken);
+            String newRefreshToken = refreshTokenService.createRefreshToken(user);
 
-            ResponseCookie jwtCookie = ResponseCookie.from("jwt", newJwtToken)
+            ResponseCookie jwtCookie = ResponseCookie.from("jwt", newToken)
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
@@ -493,65 +454,26 @@ public class UserRestController {
                     .sameSite("Strict")
                     .build();
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                    .body(Map.of("message", "Token refreshed successfully"));
-
-        } catch (Exception e) {
-            log.error("Error refreshing token", e);
-            return ResponseEntity.status(401).body(Map.of("error", "Failed to refresh token"));
-        }
-    }
-
-    @Operation(summary = "Revoke Refresh Token", description = "Revoke the current refresh token.", tags = {
-            "Authentication"})
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Refresh token revoked successfully", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                    {
-                        "message": "Refresh token revoked successfully"
-                    }
-                    """))),
-            @ApiResponse(responseCode = "400", description = "No refresh token found", content = @Content(mediaType = "application/json", examples = @ExampleObject(value = """
-                    {
-                        "error": "No refresh token found"
-                    }
-                    """)))
-    })
-    @PostMapping("/revoke-refresh")
-    public ResponseEntity<?> revokeRefreshToken(HttpServletRequest request) {
-        try {
-            String refreshToken = null;
-            if (request.getCookies() != null) {
-                for (jakarta.servlet.http.Cookie cookie : request.getCookies()) {
-                    if ("refreshToken".equals(cookie.getName())) {
-                        refreshToken = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-
-            if (refreshToken == null || refreshToken.isEmpty()) {
-                return ResponseEntity.badRequest().body(Map.of("error", "No refresh token found"));
-            }
-
-            refreshTokenService.revokeRefreshToken(refreshToken);
-            log.info("Revoked refresh token");
-
-            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", "")
+            ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", newRefreshToken)
                     .httpOnly(true)
                     .secure(false)
                     .path("/")
-                    .maxAge(0)
+                    .maxAge(7 * 24 * 60 * 60)
                     .sameSite("Strict")
                     .build();
 
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                    .body(Map.of("message", "Refresh token revoked successfully"));
+            Map<String, Object> responseMap = new HashMap<>();
+            responseMap.put("message", "Token refreshed successfully");
+            responseMap.put("userId", user.getId());
+            responseMap.put("username", user.getUsername());
+            responseMap.put("role", user.getRole().name());
 
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                    .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                    .body(responseMap);
         } catch (Exception e) {
-            log.error("Error revoking refresh token", e);
-            return ResponseEntity.badRequest().body(Map.of("error", "Failed to revoke refresh token"));
+            return ResponseEntity.status(500).body(Map.of("error", "Internal server error: " + e.getMessage()));
         }
     }
 }
