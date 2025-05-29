@@ -10,14 +10,14 @@
 }
 
 .favorite-reviews-header h1 {
-    color: #333;
+    color: #000;
     margin-bottom: 0.5rem;
     font-size: 2.5rem;
     font-weight: 700;
 }
 
 .favorite-count {
-    color: #666;
+    color: #000;
     font-size: 1.1rem;
     margin: 0;
 }
@@ -32,24 +32,25 @@
 .no-favorites {
     text-align: center;
     padding: 4rem 2rem;
-    background-color: #f9f9f9;
+    background-color: #1976d2;
     border-radius: 12px;
-    border: 2px dashed #ddd;
+    border: 2px dashed #1565c0;
 }
 
 .no-favorites-icon {
     font-size: 4rem;
     margin-bottom: 1rem;
+    color: #e3f2fd;
 }
 
 .no-favorites h3 {
-    color: #333;
+    color: #fff;
     margin-bottom: 1rem;
     font-size: 1.5rem;
 }
 
 .no-favorites p {
-    color: #666;
+    color: #e3f2fd;
     font-size: 1rem;
     max-width: 400px;
     margin: 0 auto;
@@ -74,16 +75,14 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .favorite-reviews-header h1 {
-        color: #fff;
+        color: #000;
     }
 
     .favorite-count {
-        color: #ccc;
-    }
-
-    .no-favorites {
-        background-color: #2a2a2a;
-        border-color: #555;
+        color: #000;
+    }.no-favorites {
+        background-color: #0d47a1;
+        border-color: #1565c0;
     }
 
     .no-favorites h3 {
