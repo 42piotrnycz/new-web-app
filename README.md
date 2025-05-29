@@ -29,7 +29,7 @@ The platform allows users to share their opinions on movies, books, games, and t
 - **CSS** - stylizing
 - **JavaScript** - frontend
 
-### Narzędzia i infrastruktura
+### Tools and infrastructure
 - **Maven** - build automation and project management tool
 - **Git** - version control
 - **REST API** - communication backend->frontend
