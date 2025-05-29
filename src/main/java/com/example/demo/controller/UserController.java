@@ -24,7 +24,7 @@ public class UserController {
                                       @RequestParam String email,
                                       Model model) {
         if (!userService.registerUser(username, password, email)) {
-            model.addAttribute("error", "Użytkownik o podanym loginie już istnieje.");
+            model.addAttribute("error", "User with that username already exists.");
             return "register";
         }
         return "redirect:/login";
